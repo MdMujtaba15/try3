@@ -102,3 +102,6 @@ vehicle_r
 service_area_r
 incident_r
 appraisal_r
+
+
+SEL_APPR_TYP_DC,SVC_REQ_NR,ADJ_NM,USR_RPT_BRNCH_DC,ADJ_POS_DC,EVNT_DT,DRVR_INSD_REL_TYP_DC,VEH_OPR_IN,supplements,has_rental,vehicles_in_20mi,MaterialDamageAdjuster,DirectRepairProgram,IndependentAdjuster,EstimateDeskReview,PhotoAppraisal,drivetime,br_pos_emp_count,VEH_STYL_DC_grp,make_grp,LOB_grp,coll_pnt_grp,elaps3,monthc,veh_age,lien_lease
