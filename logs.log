@@ -1,0 +1,51 @@
+2026-10-28 18:00:34,646 - lob.base - INFO - Prior month Folder Date is : 09-30-2026
+2026-10-28 18:00:34,651 - lob.base - INFO - self.src: /ere/local/shared/actuarial/Share/Claims/WPC/TESTING 2/WPC Streamlining Project/Central Scripts Repository/Material Damage/Source
+2026-10-28 18:00:34,654 - lob.base - INFO - --------------------Execution started for script: 1 Combine Hours and Counts Data.sas--------------------
+2026-10-28 18:00:34,775 - lob.base - INFO - Input parameters to the script: {'endppd': '10-28-2026', 'cutoff': '04-01-2023'}
+2026-10-28 18:00:51,978 - lob.base - INFO - SAS script 1 executed successfully
+2026-10-28 18:00:51,980 - lob.base - INFO - Output: adj_decode.sas7bdat and hcoutput.sas7bdat
+2026-10-28 18:00:51,982 - lob.base - INFO - Execution Time: 0 min 17 sec
+2026-10-28 18:00:51,984 - lob.base - INFO - --------------------Execution ends: 1 Combine Hours and Counts Data.sas--------------------
+2026-10-28 18:00:51,985 - lob.base - INFO - --------------------Execution started for script: 2 Adjuster Addresses v2.sas--------------------
+2026-10-28 18:00:52,308 - lob.base - INFO - SAS script 2 executed successfully
+2026-10-28 18:00:52,309 - lob.base - INFO - Output: No Physical file
+2026-10-28 18:00:52,309 - lob.base - INFO - Execution Time: 0 min 0 sec
+2026-10-28 18:00:52,310 - lob.base - INFO - --------------------Execution ends: 2 Adjuster Addresses v2.sas--------------------
+2026-10-28 18:00:52,311 - lob.base - INFO - --------------------Execution started for script: 3 New MDA Data Pull v2.sas--------------------
+2026-10-28 18:00:52,381 - lob.base - INFO - Input parameters to the script: {'last_folder': '10-28-2026', 'year': 2026, 'from_dt': "'01APRIL2023:00:00:00'", 'to_dt': "'28OCTOBER2026:23:59:59'", 'flag': 0, 'output_path_csv': '/ere/local/shared/actuarial/Share/Claims/WPC/TESTING 2/Material Damage/2026/10-28-2026'}
+2026-10-28 18:36:10,622 - lob.base - INFO - SAS script 3 executed successfully
+2026-10-28 18:36:10,645 - lob.base - INFO - Output: CBscoringv2.csv and for_pythonscoring.sas7bdat
+2026-10-28 18:36:10,648 - lob.base - INFO - Execution Time: 35 min 18 sec
+2026-10-28 18:36:10,649 - lob.base - INFO - --------------------Execution ends: 3 New MDA Data Pull v2.sas--------------------
+2026-10-28 18:36:10,662 - lob.base - INFO - --------------------Execution started for script: 4 Scoring File PSI.sas--------------------
+2026-10-28 18:36:10,856 - lob.base - INFO - Input parameters to the script: {'last_folder': '10-28-2026', 'year': 2026, 'saveLoc': 'A:/Share/Claims/WPC/TESTING 2/Material Damage/2026/10-28-2026'}
+2026-10-28 18:37:58,205 - lob.base - INFO - Execution Time: 1 min 47 sec
+2026-10-28 18:37:58,207 - lob.base - INFO - --------------------Execution ends: 4 Scoring File PSI.sas--------------------
+2026-10-28 18:37:58,209 - lob.base - INFO - --------------------Execution started for script: 5 2025 Scoring--------------------
+2026-10-28 18:37:58,212 - lob.base - INFO - Importing Data...
+2026-10-28 18:38:07,729 - lob.base - ERROR - Traceback (most recent call last):
+  File "C:\Users\XH787\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pandas\core\indexes\base.py", line 3641, in get_loc
+    return self._engine.get_loc(casted_key)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "pandas/_libs/index.pyx", line 168, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas/_libs/index.pyx", line 197, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas/_libs/hashtable_class_helper.pxi", line 7668, in pandas._libs.hashtable.PyObjectHashTable.get_item
+  File "pandas/_libs/hashtable_class_helper.pxi", line 7676, in pandas._libs.hashtable.PyObjectHashTable.get_item
+KeyError: 'SLVG_ASGN_ACPT_IN'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "a:\Share\Claims\WPC\TESTING 2\WPCv2\wpc-streamlining\utils.py", line 53, in inner
+    func(self, *args, **kwargs)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "a:\Share\Claims\WPC\TESTING 2\WPCv2\wpc-streamlining\lob\material_damage.py", line 252, in step_5
+    df["salvage_acpt"] = df["SLVG_ASGN_ACPT_IN"].apply(
+                         ~~^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\XH787\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pandas\core\frame.py", line 4378, in __getitem__
+    indexer = self.columns.get_loc(key)
+  File "C:\Users\XH787\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pandas\core\indexes\base.py", line 3648, in get_loc
+    raise KeyError(key) from err
+KeyError: 'SLVG_ASGN_ACPT_IN'
+2026-10-28 19:06:37,126 - lob.base - ERROR - xxxxxxxxxx Error while executing script: 5 2025 Scoring xxxxxxxxxx
+2026-10-28 19:06:37,948 - lob.base - INFO - Execution Time: 28 min 39 sec
