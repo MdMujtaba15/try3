@@ -1,77 +1,66 @@
-2026-10-28 20:06:16,925 - lob.base - INFO - Prior month Folder Date is : 09-30-2026
-2026-10-28 20:06:16,928 - lob.base - INFO - self.src: /ere/local/shared/actuarial/Share/Claims/WPC/TESTING 2/WPC Streamlining Project/Central Scripts Repository/Material Damage V2/Source
-2026-10-28 20:06:16,929 - lob.base - INFO - --------------------Execution started for script: 1 Combine Hours and Counts Data.sas--------------------
-2026-10-28 20:06:17,020 - lob.base - INFO - Input parameters to the script: {'endppd': '10-28-2026', 'cutoff': '04-01-2023'}
-2026-10-28 20:06:34,546 - lob.base - INFO - SAS script 1 executed successfully
-2026-10-28 20:06:34,547 - lob.base - INFO - Output: adj_decode.sas7bdat and hcoutput.sas7bdat
-2026-10-28 20:06:34,548 - lob.base - INFO - Execution Time: 0 min 17 sec
-2026-10-28 20:06:34,549 - lob.base - INFO - --------------------Execution ends: 1 Combine Hours and Counts Data.sas--------------------
-2026-10-28 20:06:34,550 - lob.base - INFO - --------------------Execution started for script: 2 Adjuster Addresses v2.sas--------------------
-2026-10-28 20:06:35,219 - lob.base - INFO - SAS script 2 executed successfully
-2026-10-28 20:06:35,220 - lob.base - INFO - Output: No Physical file
-2026-10-28 20:06:35,221 - lob.base - INFO - Execution Time: 0 min 0 sec
-2026-10-28 20:06:35,222 - lob.base - INFO - --------------------Execution ends: 2 Adjuster Addresses v2.sas--------------------
-2026-10-28 20:06:35,223 - lob.base - INFO - --------------------Execution started for script: 3 New MDA Data Pull v2.sas--------------------
-2026-10-28 20:06:35,309 - lob.base - INFO - Input parameters to the script: {'last_folder': '10-28-2026', 'year': 2026, 'from_dt': "'01APRIL2023:00:00:00'", 'to_dt': "'28OCTOBER2026:23:59:59'", 'flag': 0, 'output_path_csv': '/ere/local/shared/actuarial/Share/Claims/WPC/TESTING 2/Material Damage V2/2026/10-28-2026'}
-2026-10-28 20:39:28,479 - lob.base - INFO - SAS script 3 executed successfully
-2026-10-28 20:39:28,482 - lob.base - INFO - Output: CBscoringv2.csv and for_pythonscoring.sas7bdat
-2026-10-28 20:39:28,484 - lob.base - INFO - Execution Time: 32 min 53 sec
-2026-10-28 20:39:28,486 - lob.base - INFO - --------------------Execution ends: 3 New MDA Data Pull v2.sas--------------------
-2026-10-28 20:39:28,488 - lob.base - INFO - --------------------Execution started for script: 4 Scoring File PSI.sas--------------------
-2026-10-28 20:39:28,580 - lob.base - INFO - Input parameters to the script: {'last_folder': '10-28-2026', 'year': 2026, 'saveLoc': 'A:/Share/Claims/WPC/TESTING 2/Material Damage V2/2026/10-28-2026'}
-2026-10-28 20:42:12,997 - lob.base - INFO - Execution Time: 2 min 44 sec
-2026-10-28 20:42:12,999 - lob.base - INFO - --------------------Execution ends: 4 Scoring File PSI.sas--------------------
-2026-10-28 20:42:13,001 - lob.base - INFO - --------------------Execution started for script: 5 2025 Scoring--------------------
-2026-10-28 20:42:13,003 - lob.base - INFO - Importing Data...
-2026-10-28 20:42:22,122 - lob.base - INFO - # of records: 1741178
-2026-10-28 20:42:22,130 - lob.base - INFO - # of columns: 25
-2026-10-28 20:42:24,663 - lob.base - ERROR - Traceback (most recent call last):
+2026-10-30 19:10:11,045 - lob.base - INFO - Prior month Folder Date is : 09-30-2026
+2026-10-30 19:10:11,090 - lob.base - INFO - self.src: /ere/local/shared/actuarial/Share/Claims/WPC/TESTING 2/WPC Streamlining Project/Central Scripts Repository/Material Damage V2/Source
+2026-10-30 19:10:11,109 - lob.base - INFO - --------------------Execution started for script: 1 Combine Hours and Counts Data.sas--------------------
+2026-10-30 19:10:11,202 - lob.base - INFO - Input parameters to the script: {'endppd': '10-28-2026', 'cutoff': '04-01-2023'}
+2026-10-30 19:10:28,433 - lob.base - INFO - SAS script 1 executed successfully
+2026-10-30 19:10:28,435 - lob.base - INFO - Output: adj_decode.sas7bdat and hcoutput.sas7bdat
+2026-10-30 19:10:28,437 - lob.base - INFO - Execution Time: 0 min 17 sec
+2026-10-30 19:10:28,439 - lob.base - INFO - --------------------Execution ends: 1 Combine Hours and Counts Data.sas--------------------
+2026-10-30 19:10:28,440 - lob.base - INFO - --------------------Execution started for script: 2 Adjuster Addresses v2.sas--------------------
+2026-10-30 19:10:28,763 - lob.base - INFO - SAS script 2 executed successfully
+2026-10-30 19:10:28,765 - lob.base - INFO - Output: No Physical file
+2026-10-30 19:10:28,767 - lob.base - INFO - Execution Time: 0 min 0 sec
+2026-10-30 19:10:28,769 - lob.base - INFO - --------------------Execution ends: 2 Adjuster Addresses v2.sas--------------------
+2026-10-30 19:10:28,776 - lob.base - INFO - --------------------Execution started for script: 3 New MDA Data Pull v2.sas--------------------
+2026-10-30 19:10:28,880 - lob.base - INFO - Input parameters to the script: {'last_folder': '10-28-2026', 'year': 2026, 'from_dt': "'01APRIL2023:00:00:00'", 'to_dt': "'28OCTOBER2026:23:59:59'", 'flag': 0, 'output_path_csv': '/ere/local/shared/actuarial/Share/Claims/WPC/TESTING 2/Material Damage V2/2026/10-28-2026'}
+2026-10-30 20:26:06,018 - lob.base - INFO - SAS script 3 executed successfully
+2026-10-30 20:26:06,023 - lob.base - INFO - Output: CBscoringv2.csv and for_pythonscoring.sas7bdat
+2026-10-30 20:26:06,026 - lob.base - INFO - Execution Time: 75 min 37 sec
+2026-10-30 20:26:06,027 - lob.base - INFO - --------------------Execution ends: 3 New MDA Data Pull v2.sas--------------------
+2026-10-30 20:26:06,030 - lob.base - INFO - --------------------Execution started for script: 4 Scoring File PSI.sas--------------------
+2026-10-30 20:26:06,128 - lob.base - INFO - Input parameters to the script: {'last_folder': '10-28-2026', 'year': 2026, 'saveLoc': 'A:/Share/Claims/WPC/TESTING 2/Material Damage V2/2026/10-28-2026'}
+2026-10-30 20:27:26,243 - lob.base - INFO - Execution Time: 1 min 20 sec
+2026-10-30 20:27:26,244 - lob.base - INFO - --------------------Execution ends: 4 Scoring File PSI.sas--------------------
+2026-10-30 20:27:26,246 - lob.base - INFO - --------------------Execution started for script: 5 2025 Scoring--------------------
+2026-10-30 20:27:26,248 - lob.base - INFO - Importing Data...
+2026-10-30 20:27:26,397 - lob.base - ERROR - Traceback (most recent call last):
+  File "C:\Users\XH787\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pandas\io\parsers\c_parser_wrapper.py", line 215, in read
+    chunks = self._reader.read_low_memory(nrows)
+  File "pandas/_libs/parsers.pyx", line 857, in pandas._libs.parsers.TextReader.read_low_memory
+StopIteration
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
   File "a:\Share\Claims\WPC\TESTING 2\WPCv2\wpc-streamlining\utils.py", line 53, in inner
     func(self, *args, **kwargs)
     ~~~~^^^^^^^^^^^^^^^^^^^^^^^
-  File "a:\Share\Claims\WPC\TESTING 2\WPCv2\wpc-streamlining\lob\material_damage.py", line 677, in step_5
-    df.fillna(-1, inplace=True)
-    ~~~~~~~~~^^^^^^^^^^^^^^^^^^
-  File "C:\Users\XH787\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pandas\core\generic.py", line 7147, in fillna
-    new_data = self._mgr.fillna(value=value, limit=limit, inplace=inplace)
-  File "C:\Users\XH787\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pandas\core\internals\managers.py", line 461, in fillna
-    return self.apply(
-           ~~~~~~~~~~^
-        "fillna",
-        ^^^^^^^^^
-    ...<2 lines>...
-        inplace=inplace,
-        ^^^^^^^^^^^^^^^^
+  File "a:\Share\Claims\WPC\TESTING 2\WPCv2\wpc-streamlining\lob\material_damage.py", line 666, in step_5
+    df = pd.read_csv(df_path, index_col="SVC_REQ_NR")
+  File "C:\Users\XH787\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pandas\io\parsers\readers.py", line 873, in read_csv
+    return _read(filepath_or_buffer, kwds)
+  File "C:\Users\XH787\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pandas\io\parsers\readers.py", line 306, in _read
+    return parser.read(nrows)
+           ~~~~~~~~~~~^^^^^^^
+  File "C:\Users\XH787\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pandas\io\parsers\readers.py", line 1947, in read
+    ) = self._engine.read(  # type: ignore[attr-defined]
+        ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        nrows
+        ^^^^^
     )
     ^
-  File "C:\Users\XH787\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pandas\core\internals\managers.py", line 445, in apply
-    applied = getattr(b, f)(**kwargs)
-  File "C:\Users\XH787\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pandas\core\internals\blocks.py", line 1895, in fillna
-    return super().fillna(
-           ~~~~~~~~~~~~~~^
-        value=value,
-        ^^^^^^^^^^^^
-        limit=limit,
-        ^^^^^^^^^^^^
-        inplace=inplace,
-        ^^^^^^^^^^^^^^^^
+  File "C:\Users\XH787\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pandas\io\parsers\c_parser_wrapper.py", line 230, in read
+    index, columns, col_dict = self._get_empty_meta(
+                               ~~~~~~~~~~~~~~~~~~~~^
+        names,
+        ^^^^^^
+        dtype=self.dtype,
+        ^^^^^^^^^^^^^^^^^
     )
     ^
-  File "C:\Users\XH787\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pandas\core\internals\blocks.py", line 1342, in fillna
-    nbs = self.putmask(mask.T, value)
-  File "C:\Users\XH787\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pandas\core\internals\blocks.py", line 1776, in putmask
-    values._putmask(mask, new)
-    ~~~~~~~~~~~~~~~^^^^^^^^^^^
-  File "C:\Users\XH787\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pandas\core\arrays\string_.py", line 888, in _putmask
-    ExtensionArray._putmask(self, mask, value)
-    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\XH787\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pandas\core\arrays\base.py", line 2585, in _putmask
-    self[mask] = val
-    ~~~~^^^^^^
-  File "C:\Users\XH787\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pandas\core\arrays\string_.py", line 864, in __setitem__
-    value = self._maybe_convert_setitem_value(value)
-  File "C:\Users\XH787\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pandas\core\arrays\string_.py", line 838, in _maybe_convert_setitem_value
-    raise TypeError(
-    ...<3 lines>...
-    )
-TypeError: Invalid value '-1' for dtype 'str'. Value should be a string or missing value, got 'int' instead.
+  File "C:\Users\XH787\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pandas\io\parsers\base_parser.py", line 754, in _get_empty_meta
+    columns.pop(n - i)
+                ~~^~~
+TypeError: unsupported operand type(s) for -: 'str' and 'int'
+2026-10-30 20:34:02,032 - lob.base - ERROR - xxxxxxxxxx Error while executing script: 5 2025 Scoring xxxxxxxxxx
+2026-10-30 20:34:02,069 - lob.base - INFO - Execution Time: 6 min 35 sec
