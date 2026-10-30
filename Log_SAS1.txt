@@ -1,0 +1,447 @@
+6                                                          The SAS System                             09:40 Friday, October 30, 2026
+
+15         
+16                         ods listing close;
+17                         ods html5 (id=saspy_internal) options(bitmap_mode='inline')
+18                             file="/saswork/SAS_work213F003B408E_prdsasgridn11/SAS_workA159003B408E_prdsasgridn11/saspy_results.ht
+18       ! ml"
+19                             device=svg
+20                             style=HTMLBlue;
+NOTE: Writing HTML5(SASPY_INTERNAL) Body file: 
+      /saswork/SAS_work213F003B408E_prdsasgridn11/SAS_workA159003B408E_prdsasgridn11/saspy_results.html
+21                         ods graphics on / outputfmt=png;
+22                     ;*';*";*/;quit;run;/* Material Damage SAS Script 1 : Combine Hours and Counts Data*/
+23         
+24         options validvarname=ANY;
+25         
+26         
+27         /*macro to change column type to number format*/
+28         %macro changeColFormat2Num(table_name,col_list,format_new);
+29         
+30         	%do i=1 %to %eval(%sysfunc(countc(&col_list.,"|"))+1);
+31         		%let col_name = %sysfunc(scan(&col_list.,&i.,"|"));
+32         /*		%put &col_name.;*/
+33         		data &table_name.(drop= temp);
+34         		set &table_name.(rename= &col_name. = temp);
+35         		format &col_name. &format_new.;
+36         		&col_name.=(temp*1.0);
+37         		run;
+38         	%end;
+39         %mend changeColFormat2Num;
+40         
+41         
+42         /*macro to change column type to number format*/
+43         %macro changeColFormat2Char(table_name,col_list,format_new);
+44         
+45         	%do i=1 %to %eval(%sysfunc(countc(&col_list.,"|"))+1);
+46         		%let col_name = %sysfunc(scan(&col_list.,&i.,"|"));
+47         /*		%put &col_name.;*/
+48         
+49         		proc sql noprint;
+50         		select type, length+2 into :col_type, :col_length
+51         		from sashelp.vcolumn
+52         		where libname = 'WORK' and memname = upcase("&table_name.")
+53         			and Name = tranwrd(tranwrd("&col_name.","'n",""),"'","");;
+54         		quit;
+55         		
+56         		%if %qupcase(&col_type.)NE CHAR %then %do;
+57         			data &table_name.(drop= temp);
+58         			set &table_name.(rename= &col_name. = temp);
+59         			format &col_name. $&col_length..;
+60         			&col_name.=Cats(temp);
+61         			run;
+62         		%end;
+63         	%end;
+64         %mend changeColFormat2Char;
+65         
+66         /* import file from marybeth */
+67         PROC IMPORT DATAFILE='/ere/local/shared/actuarial/Share/Claims/WPC/TESTING 2/Adj Prod by MDServices_Template.xlsx'
+68         	DBMS=XLSX
+69         	REPLACE
+70         	OUT=both1;
+71         	sheet=  "MD_all";
+72         	GETNAMES=yes;
+73         RUN;
+
+NOTE: One or more variables were converted because the data type is not supported by the V9 engine. For more details, run with 
+      options MSGLEVEL=I.
+NOTE: The import data set has 119116 observations and 36 variables.
+NOTE: WORK.BOTH1 data set was successfully created.
+NOTE: PROCEDURE IMPORT used (Total process time):
+      real time           16.17 seconds
+      user cpu time       15.22 seconds
+      system cpu time     0.45 seconds
+      memory              47147.43k
+      OS Memory           68944.00k
+      Timestamp           10/30/2026 09:40:27 AM
+      Step Count                        2  Switch Count  1
+      Page Faults                       143
+      Page Reclaims                     12231
+      Page Swaps                        0
+      Voluntary Context Switches        50
+      Involuntary Context Switches      87
+      Block Input Operations            35232
+      Block Output Operations           63520
+      
+
+74         
+75         proc sql;
+76         	create table dups as
+77         	select *
+78         	from both1
+79         	group by 'EMP_ID'n, 'PayperiodEnd'n
+80         	having count(*) gt 1;
+NOTE: The query requires remerging summary statistics back with the original data.
+NOTE: Table WORK.DUPS created, with 0 rows and 36 columns.
+
+81         quit;
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.14 seconds
+      user cpu time       0.06 seconds
+      system cpu time     0.09 seconds
+      memory              43234.34k
+      OS Memory           60720.00k
+      Timestamp           10/30/2026 09:40:27 AM
+      Step Count                        3  Switch Count  2
+      Page Faults                       291
+      Page Reclaims                     7083
+      Page Swaps                        0
+      Voluntary Context Switches        616
+      Involuntary Context Switches      1
+      Block Input Operations            0
+      Block Output Operations           68136
+      
+
+82         
+83         
+84         	
+84       !  data both;
+85         		set both1;
+86         		format payperioddate mmddyy10.;
+87         
+88         		keep 'REGION'n
+89         		'RPT_ENTITY'n
+90         		'SPVS_EMP_ID'n
+91         		'SPVS_NM'n
+92         		'JOB_TTL_FULL'n
+93         		'JOB_TTL'n
+94         		'USR_NTRL_ID'n
+95         		'EMP_ID'n
+96         		'EMP_NM'n
+97         		'MaskEmpl'n
+98         		'DISCIPLINE'n
+99         		'DISC_SEC'n
+100        		'WRK_CLASS'n
+101        		'LEADER_NM'n
+102        		'LEADER_EMP_ID'n
+103        		'PRIM_ROL_NM'n
+104        		'PayperiodEnd'n
+105        		'EmpIDPPE'n
+106        		'PayperiodEnd_dt'n
+107        		'EmpIDPPE_dt'n
+108        		'Total_Hours'n
+109        		'TotalRegHrsPaid'n
+110        		'TotalOTHrsPaid'n
+111        		'TotalPTOHrsPaid'n
+112        		'TotalOffSiteBus'n
+113        		'StartDateinPosition'n
+114        		'HireDate'n
+115        		'ALL Services Completed'n
+116        		'MDA Services Complete'n
+117        		'Direct Repair Program'n
+118        		'Estimate Desk Review'n
+119        		'Independent Adjuster'n
+120        		'Open Shop'n
+121        		'Photo Appraisal'n
+122        		'Salvage'n
+123        		'DimVal'n
+124        		payperiod_pre
+125        		payperioddate
+126        		;
+127        		payperiod_pre = put('PayPeriod Ending'n,8.);
+128        		payperioddate =
+128      ! mdy(input(substr(payperiod_pre,5,2),2.),input(substr(payperiod_pre,7,2),2.),input(substr(payperiod_pre,1,4),4.));
+129        
+130        		;
+131        	run;
+
+NOTE: Variable 'PayPeriod Ending'n is uninitialized.
+NOTE: Missing values were generated as a result of performing an operation on missing values.
+      Each place is given by: (Number of times) at (Line):(Column).
+      119116 at 128:19   
+NOTE: There were 119116 observations read from the data set WORK.BOTH1.
+NOTE: The data set WORK.BOTH has 119116 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.05 seconds
+      user cpu time       0.02 seconds
+      system cpu time     0.03 seconds
+      memory              1447.15k
+      OS Memory           21156.00k
+      Timestamp           10/30/2026 09:40:27 AM
+      Step Count                        4  Switch Count  1
+      Page Faults                       47
+      Page Reclaims                     255
+      Page Swaps                        0
+      Voluntary Context Switches        16
+      Involuntary Context Switches      0
+      Block Input Operations            8
+      Block Output Operations           67608
+      
+
+132        
+133        PROC SQL;
+134        	CREATE TABLE mdl_curr.hcoutput As
+135        		Select
+136        		'REGION'n,
+137        		'RPT_ENTITY'n,
+138        		'SPVS_EMP_ID'n,
+139        		'SPVS_NM'n,
+140        		'JOB_TTL_FULL'n,
+141        		'JOB_TTL'n,
+142        		'USR_NTRL_ID'n,
+143        		'EMP_ID'n,
+144        		'EMP_NM'n,
+145        		'MaskEmpl'n,
+146        		'DISCIPLINE'n,
+147        		'DISC_SEC'n,
+148        		'WRK_CLASS'n,
+149        		'LEADER_NM'n,
+150        		'LEADER_EMP_ID'n,
+151        		'PRIM_ROL_NM'n,
+152        		'PayperiodEnd'n,
+153        		'EmpIDPPE'n,
+154        		'PayperiodEnd_dt'n,
+155        		'EmpIDPPE_dt'n,
+156        		'Total_Hours'n,
+157        		'TotalRegHrsPaid'n,
+158        		'TotalOTHrsPaid'n,
+159        		'TotalPTOHrsPaid'n,
+160        		'TotalOffSiteBus'n,
+161        		'StartDateinPosition'n,
+162        		'HireDate'n,
+163        		 payperioddate,
+164        		 'ALL Services Completed'n,
+165        		 'MDA Services Complete'n,
+166        		 'Direct Repair Program'n,
+167        		 'Estimate Desk Review'n,
+168        		 'Independent Adjuster'n,
+169        		 'Open Shop'n,
+170        		 'Photo Appraisal'n,
+171        		 Salvage,
+172        		 DimVal
+173        	From both
+174                 /*		where payperioddate >= &cutoff*/
+175        	;
+NOTE: Table MDL_CURR.HCOUTPUT created, with 119116 rows and 37 columns.
+
+176        QUIT;
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.07 seconds
+      user cpu time       0.01 seconds
+      system cpu time     0.04 seconds
+      memory              5835.81k
+      OS Memory           25764.00k
+      Timestamp           10/30/2026 09:40:27 AM
+      Step Count                        5  Switch Count  2
+      Page Faults                       3
+      Page Reclaims                     226
+      Page Swaps                        0
+      Voluntary Context Switches        271
+      Involuntary Context Switches      1
+      Block Input Operations            32
+      Block Output Operations           65552
+      
+
+177        
+178        /* added fields for qlik file, but excel not want */
+179        	
+179      !  data output;
+180        		set mdl_curr.hcoutput;
+181        		drop
+182        		'SPVS_EMP_ID'n
+183        		'SPVS_NM'n
+184        		'EMP_NM'n
+185        	;
+186        	run;
+
+NOTE: There were 119116 observations read from the data set MDL_CURR.HCOUTPUT.
+NOTE: The data set WORK.OUTPUT has 119116 observations and 34 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.09 seconds
+      user cpu time       0.00 seconds
+      system cpu time     0.04 seconds
+      memory              1406.12k
+      OS Memory           21156.00k
+      Timestamp           10/30/2026 09:40:27 AM
+      Step Count                        6  Switch Count  1
+      Page Faults                       6
+      Page Reclaims                     216
+      Page Swaps                        0
+      Voluntary Context Switches        159
+      Involuntary Context Switches      0
+      Block Input Operations            65568
+      Block Output Operations           54288
+      
+
+187        
+188        /* create adjuster/branch/position decode */
+189        PROC SQL;
+190        	CREATE TABLE adjusters_decode As
+191        		Select distinct
+192                a.'EMP_NM'n,
+193                a.'JOB_TTL_FULL'n,
+194        		a.'RPT_ENTITY'n,
+195        		a.'EMP_ID'n,
+196        		cat('RPT_ENTITY'n,'JOB_TTL_FULL'n) as group
+197        		From both as A
+198        		/*where a.payperioddate	>= &endppd */
+199        		order by
+200        		a.'RPT_ENTITY'n
+201        		,a.'JOB_TTL_FULL'n
+202        		,a.'EMP_NM'n
+203        		,a.'EMP_ID'n	
+204        	;
+NOTE: Table WORK.ADJUSTERS_DECODE created, with 1431 rows and 5 columns.
+
+205        QUIT;
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.13 seconds
+      user cpu time       0.07 seconds
+      system cpu time     0.11 seconds
+      memory              67886.48k
+      OS Memory           85936.00k
+      Timestamp           10/30/2026 09:40:27 AM
+      Step Count                        7  Switch Count  2
+      Page Faults                       78
+      Page Reclaims                     16234
+      Page Swaps                        0
+      Voluntary Context Switches        117
+      Involuntary Context Switches      0
+      Block Input Operations            0
+      Block Output Operations           61984
+      
+
+206        
+207        /* add counter and lookup field */
+208        	
+208      !  data adjusters_decode;
+209        		set adjusters_decode;
+210        		by group;
+211        		retain agt;
+212        		if first.group = 1 then agt = 1; else agt = agt+1;
+213        	run;
+
+NOTE: There were 1431 observations read from the data set WORK.ADJUSTERS_DECODE.
+NOTE: The data set WORK.ADJUSTERS_DECODE has 1431 observations and 6 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      user cpu time       0.01 seconds
+      system cpu time     0.00 seconds
+      memory              1397.12k
+      OS Memory           21156.00k
+      Timestamp           10/30/2026 09:40:27 AM
+      Step Count                        8  Switch Count  1
+      Page Faults                       19
+      Page Reclaims                     224
+      Page Swaps                        0
+      Voluntary Context Switches        9
+      Involuntary Context Switches      0
+      Block Input Operations            0
+      Block Output Operations           1040
+      
+
+213      !      	
+214        	
+214      !   PROC SQL;
+215        		CREATE TABLE adjusters_decode2 As
+216        			Select
+217        				cat(agt,trim('RPT_ENTITY'n),'JOB_TTL_FULL'n) as bradjseq
+218        				,'EMP_NM'n	
+219        				,'JOB_TTL_FULL'n
+220        				,'RPT_ENTITY'n
+221        				,'EMP_ID'n
+222        			From adjusters_decode
+223        			;
+NOTE: Table WORK.ADJUSTERS_DECODE2 created, with 1431 rows and 5 columns.
+
+224        		QUIT;
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.00 seconds
+      user cpu time       0.00 seconds
+      system cpu time     0.00 seconds
+      memory              5742.53k
+      OS Memory           25764.00k
+      Timestamp           10/30/2026 09:40:27 AM
+      Step Count                        9  Switch Count  1
+      Page Faults                       18
+      Page Reclaims                     226
+      Page Swaps                        0
+      Voluntary Context Switches        8
+      Involuntary Context Switches      0
+      Block Input Operations            0
+      Block Output Operations           1040
+      
+
+225        
+226        /* dupes? */
+227        proc sql;
+228           create table duplicates as
+229           select *
+230              from adjusters_decode2
+231              group by 'EMP_NM'n
+232              having count(*) gt 1;
+NOTE: The query requires remerging summary statistics back with the original data.
+NOTE: Table WORK.DUPLICATES created, with 517 rows and 5 columns.
+
+233        quit;
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.01 seconds
+      user cpu time       0.00 seconds
+      system cpu time     0.01 seconds
+      memory              12762.39k
+      OS Memory           30960.00k
+      Timestamp           10/30/2026 09:40:27 AM
+      Step Count                        10  Switch Count  1
+      Page Faults                       58
+      Page Reclaims                     626
+      Page Swaps                        0
+      Voluntary Context Switches        28
+      Involuntary Context Switches      2
+      Block Input Operations            0
+      Block Output Operations           1576
+      
+
+234        /* yes, from job switches. should be okay */
+235        
+236        /* create decode to use in model output */
+237        proc sql;
+238           create table mdl_curr.adj_decode as
+239           select distinct
+240        			compress(a.'EMP_NM'n) as EMP_NM
+241        			,a.'EMP_ID'n
+242              from both1 as a
+243        ;
+NOTE: Table MDL_CURR.ADJ_DECODE created, with 1139 rows and 2 columns.
+
+244        quit;
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.06 seconds
+      user cpu time       0.04 seconds
+      system cpu time     0.03 seconds
+      memory              14794.48k
+      OS Memory           32800.00k
+      Timestamp           10/30/2026 09:40:28 AM
+      Step Count                        11  Switch Count  2
+      Page Faults                       89
+      Page Reclaims                     2845
+      Page Swaps                        0
+      Voluntary Context Switches        74
+      Involuntary Context Switches      3
+      Block Input Operations            32
+      Block Output Operations           7720
+      
+
+244      !      ;*';*";*/;quit;run;
+245                        ods html5 (id=saspy_internal) close;
+246                        ods listing;
+247        

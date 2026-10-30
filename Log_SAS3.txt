@@ -1,0 +1,1692 @@
+17                                                         The SAS System                             09:40 Friday, October 30, 2026
+
+322        
+323                        ods listing close;
+324                        ods html5 (id=saspy_internal) options(bitmap_mode='inline')
+325                            file="/saswork/SAS_work213F003B408E_prdsasgridn11/SAS_workA159003B408E_prdsasgridn11/saspy_results.ht
+325      ! ml"
+326                            device=svg
+327                            style=HTMLBlue;
+NOTE: Writing HTML5(SASPY_INTERNAL) Body file: 
+      /saswork/SAS_work213F003B408E_prdsasgridn11/SAS_workA159003B408E_prdsasgridn11/saspy_results.html
+328                        ods graphics on / outputfmt=png;
+329                    ;*';*";*/;quit;run;/* Material Damage SAS Script 3 : 3 New MDA Data Pull v2*/
+330        
+331        /* CCDS*/
+332        LIBNAME CCDS ORACLE PATH=CDEP1 SCHEMA=BRFADM Authdomain=Oracle_Auth_CCDS;
+NOTE:  Credential obtained from SAS metadata server.
+NOTE: Libref CCDS was successfully assigned as follows: 
+      Engine:        ORACLE 
+      Physical Name: CDEP1
+333        
+334        proc sql;
+335             connect using ccds;
+336             create table MDA_SVC as
+337             select * from connection to ccds
+338             (
+339             select distinct
+340        	CLM.CLM_NR
+341        	, CLM.LOB_DC
+342        	, clm.clm_ntrl_id
+343        
+344        	, SVC_REQ.SEL_APPR_TYP_DC
+345        	, SVC_REQ.CRT_DT AS SVC_CRT_DT
+346        	, SVC_REQ.SVC_REQ_NR
+347        	, SVC_REQ.ASGN_USR_ID
+348        	, SVC_REQ.LST_upd_DT
+349        	, SVC_REQ.SEL_INSP_TYP_DC
+350        	, SVC_REQ.SVC_REQ_TYP_DC
+351        	, SVC_REQ.SLVG_ASGN_ACPT_IN
+352        
+353        	, srhm.adj_nm
+354        	, srhm.USR_RPT_BRNCH_DC
+355        	, srhm.ADJ_POS_DC
+356        
+357        	, SVCREQ_WRKLD_HIST.EVNT_DT
+358        	, SVCREQ_WRKLD_HIST.SVC_REQ_PRGRS_TYP_DC
+359        	, SVCREQ_WRKLD_HIST.SVC_REQ_NTRL_ID
+360        	, SVCREQ_WRKLD_HIST.WRKLD_HIST_TYP_DC
+361        	, SVCREQ_WRKLD_HIST.EXPSR_NTRL_ID
+362        
+363        	, veh.MFR_YR
+364            , veh.MAKE_NM
+365        
+366        	, INCID.INCID_NTRL_ID
+367        	, incid.DRVR_INSD_REL_TYP_DC
+368        	, incid.LIEN_LEAS_DC
+369        	, incid.VEH_OPR_IN
+370        	, incid.VEH_STYL_DC
+371        	, incid.VEH_USE_RSN_DC
+372        	, incid.COL_PNT_TYP_cd
+373        	, ENTPR_CD_VW.cd_lbl as COL_PNT_TYP_DC2
+374        
+375        	/* vehicle inspection */
+376        	, ad.pstl_cd
+377        	, AD.AD_NTRL_ID		/* to get language line */
+378        
+379        	/* salvage */
+380        	, spclsvc.SVC_TYP_DC
+381        
+382        	from
+383        	BRFADM.CLM
+384        	LEFT JOIN BRFADM.INCID
+385        		ON CLM.CLM_NTRL_ID = INCID.CLM_NTRL_ID
+386        		AND INCID.REC_RET_IN = 'N' AND INCID.CRNT_REC_IN = 'Y'
+387        
+388        	LEFT JOIN BRFADM.SVC_REQ
+389        		ON INCID.INCID_NTRL_ID = SVC_REQ.INCID_NTRL_ID
+390        		AND SVC_REQ.REC_RET_IN = 'N' AND SVC_REQ.CRNT_REC_IN = 'Y'
+391        		AND SVC_REQ.CRT_DT BETWEEN to_date(&from_dt,'DDMONYYYY:HH24:MI:SS') AND to_date(&to_dt,'DDMONYYYY:HH24:MI:SS')
+392        
+393        	left join BRFADM.SVC_REQ_HRCHY_MV srhm
+394        		on svc_req.SVC_REQ_NTRL_ID = srhm.SVC_REQ_NTRL_ID
+395        		and svc_req.lst_upd_dt between srhm.SVC_STRT_DT and srhm.SVC_END_DT
+396        
+397        	left join BRFADM.WRKLD_HIST SVCREQ_WRKLD_HIST
+398        		on svc_req.SVC_REQ_NTRL_ID = SVCREQ_WRKLD_HIST.SVC_REQ_NTRL_ID
+399        		and svc_req.ASGN_USR_ID = SVCREQ_WRKLD_HIST.ASGN_USR_ID
+400        
+401        	left join BRFADM.VEH veh
+402        		on veh.VEH_NTRL_ID = incid.VEH_NTRL_ID
+403        		And veh.rec_ret_in = 'N' and veh.crnt_rec_in= 'Y'
+404        
+405        	/* inspection address */
+406        	left join BRFADM.ad
+407        		on INCID.INSP_LOC_ID = AD.AD_NTRL_ID
+408        		and ad.crnt_rec_in = 'Y' and ad.rec_ret_in = 'N'
+409        
+410        	/* salvage */
+411        	left join BRFADM.SVC_REQ_INSTR svcinstr
+412        		on svcinstr.SVC_REQ_NTRL_ID = SVC_REQ.SVC_REQ_NTRL_ID
+413        		and svcinstr.CRNT_REC_IN = 'Y'
+414        	left join BRFADM.SVC_REQ_INSTR_SVC svcinstrsvc
+415        		on svcinstrsvc.SVC_REQ_INSTR_NTRL_ID = svcinstr.SVC_REQ_INSTR_NTRL_ID
+416        		and svcinstrsvc.CRNT_REC_IN = 'Y'
+417        	left join BRFADM.SPCL_SVC spclsvc
+418        		on spclsvc.SPCL_SVC_NTRL_ID=svcinstrsvc.SPCL_SVC_NTRL_ID
+419        		and spclsvc.crnt_rec_in= 'Y'
+420        
+421        	/* fixed collision point */
+422        	left join BRFADM.ENTPR_CD_VW ENTPR_CD_VW
+423        		on ENTPR_CD_VW.entpr_cd_id = incid.COL_PNT_TYP_cd
+424        		and ENTPR_CD_VW.CD_SCHM_ID = 668
+425        
+426        	where
+427        	SVCREQ_WRKLD_HIST.SVC_REQ_PRGRS_TYP_DC = 'WorkComplete'
+428        	and SVCREQ_WRKLD_HIST.WRKLD_HIST_TYP_DC = 'Closed'
+429        
+430        	);
+ERROR: ORACLE execute error: ORA-30032: the suspended (resumable) statement has timed out
+ORA-01652: unable to extend temp segment 
+       by 128 in tablespace TEMP.
+
+NOTE: PROC SQL set option NOEXEC and will continue to check the syntax of statements.
+431        
+432        	disconnect from ccds
+433        ;
+NOTE: Statement not executed due to NOEXEC option.
+433      !  quit;
+NOTE: The SAS System stopped processing this step because of errors.
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           1:08:09.62
+      user cpu time       0.07 seconds
+      system cpu time     0.04 seconds
+      memory              5547.12k
+      OS Memory           23968.00k
+      Timestamp           10/30/2026 10:48:38 AM
+      Step Count                        22  Switch Count  0
+      Page Faults                       59
+      Page Reclaims                     519
+      Page Swaps                        0
+      Voluntary Context Switches        1364
+      Involuntary Context Switches      5
+      Block Input Operations            8
+      Block Output Operations           1160
+      
+434        
+435        /* make salvage a service */
+436        
+437        	
+
+
+437      !  data mda_svc (drop=SVC_TYP_DC);
+438        		set mda_svc;
+ERROR: File WORK.MDA_SVC.DATA does not exist.
+439        		if missing(SVC_TYP_DC) and missing(SEL_APPR_TYP_DC) then delete;
+440        		else if missing(SEL_APPR_TYP_DC) then SEL_APPR_TYP_DC = SVC_TYP_DC;
+441        	run;
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.MDA_SVC may be incomplete.  When this step was stopped there were 0 observations and 1 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      user cpu time       0.01 seconds
+      system cpu time     0.01 seconds
+      memory              749.09k
+      OS Memory           19616.00k
+      Timestamp           10/30/2026 10:48:38 AM
+      Step Count                        23  Switch Count  1
+      Page Faults                       35
+      Page Reclaims                     439
+      Page Swaps                        0
+      Voluntary Context Switches        10
+      Involuntary Context Switches      5
+      Block Input Operations            8
+      Block Output Operations           528
+      
+
+442        /* filter for the services we want to include */
+443        data mda_svc;
+444        	set mda_svc;
+445        	where SEL_APPR_TYP_DC in
+446        		('MaterialDamageAdjuster',
+447        		'DirectRepairProgram',
+448        		'IndependentAdjuster',
+449        		'EstimateDeskReview',
+450        		'OpenShop',
+451        		'PhotoAppraisal',
+452        		'Salvage');
+ERROR: WHERE clause operator requires compatible variables.
+453        
+454        	/* at 6/24 meeting they said these are the same for assignment type */
+455        	if ADJ_POS_DC in ('Material Damage Adj (Trainee)','Material Damage Adj I','Material Damage Adj II',
+456        		'Material Damage Adjsuter II','Material Damage Adjuser I','Material Damage Adjuster',
+457        		'Material Damage Adjuster I','Material Damage Adjuster II','Material Damage Adjutster II') then
+458        		ADJ_POS_DC = 'Material Damage Adjuster';
+459        	else if ADJ_POS_DC in ('Material Damage Inside Adj I','Material Damage Inside Adjuster I','Material Damage Inside
+459      ! Adjuster')
+460        		then
+461        		ADJ_POS_DC = 'Material Damage Inside Adjuster I';
+462        	else if ADJ_POS_DC in ('Material Damage Inside  Adjuster II','Material Damage Inside Adj II'
+463        		'Material Damage Inside Adjsuter II','Material Damage Inside Adjuster II')
+464        		then
+465        		ADJ_POS_DC = 'Material Damage Inside Adjuster II';
+466        
+467        	/* we did unique names in iniital pull, but sometimes names have asterisk if RMV */
+468        	ADJ_NM = compress(strip(tranwrd(ADJ_NM,"T*","")));
+469        
+470        	/* no assigned name/adjuster yet */
+471        	if index(ADJ_NM,"Pending")>0 then
+472        		delete;
+473        
+474        	/* odd one-offs 3.6.2025 */
+475        	if ADJ_NM = 'Wynder,Cherrish' then
+476        		ADJ_NM = 'Clayton,Cherrish';
+477        
+478        	if ADJ_NM = 'Moffitt,David' then
+479        		ADJ_NM = 'Moffitt,Brandon';
+480        
+481        	/* rare duplicate source */
+482        	if substr(clm_nr,1,1) = 'Z' then
+483        		delete;
+484        run;
+
+NOTE: Numeric values have been converted to character values at the places given by: (Line):(Column).
+      468:34   471:11   482:12   
+NOTE: Character values have been converted to numeric values at the places given by: (Line):(Column).
+      468:11   475:14   476:12   478:14   479:12   
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.MDA_SVC may be incomplete.  When this step was stopped there were 0 observations and 4 variables.
+WARNING: Data set WORK.MDA_SVC was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      user cpu time       0.00 seconds
+      system cpu time     0.00 seconds
+      memory              1293.18k
+      OS Memory           20132.00k
+      Timestamp           10/30/2026 10:48:38 AM
+      Step Count                        24  Switch Count  0
+      Page Faults                       16
+      Page Reclaims                     155
+      Page Swaps                        0
+      Voluntary Context Switches        1
+      Involuntary Context Switches      5
+      Block Input Operations            0
+      Block Output Operations           16
+      
+
+485        /* re-do distinct pull */
+486        PROC SQL;
+487        	CREATE TABLE mda_svc As
+488        		Select Distinct *
+489        			From mda_svc as A
+490        	;
+WARNING: This CREATE TABLE statement recursively references the target table. A consequence of this is a possible data integrity 
+         problem.
+NOTE: Table WORK.MDA_SVC created, with 0 rows and 1 columns.
+
+491        QUIT;
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.00 seconds
+      user cpu time       0.01 seconds
+      system cpu time     0.00 seconds
+      memory              5711.81k
+      OS Memory           24740.00k
+      Timestamp           10/30/2026 10:48:38 AM
+      Step Count                        25  Switch Count  1
+      Page Faults                       2
+      Page Reclaims                     234
+      Page Swaps                        0
+      Voluntary Context Switches        9
+      Involuntary Context Switches      6
+      Block Input Operations            0
+      Block Output Operations           528
+      
+
+492        		
+493        /* check for success - should be 0 records */
+494        proc sql;
+495        	create table duplicates as
+496        		select *
+497        			from mda_svc as a
+498        				group by a.SVC_REQ_NR
+499        					having count(*) gt 1;
+ERROR: Column SVC_REQ_NR could not be found in the table/view identified with the correlation name A.
+NOTE: PROC SQL set option NOEXEC and will continue to check the syntax of statements.
+500        quit;
+NOTE: The SAS System stopped processing this step because of errors.
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.00 seconds
+      user cpu time       0.00 seconds
+      system cpu time     0.00 seconds
+      memory              5727.37k
+      OS Memory           24740.00k
+      Timestamp           10/30/2026 10:48:38 AM
+      Step Count                        26  Switch Count  0
+      Page Faults                       0
+      Page Reclaims                     78
+      Page Swaps                        0
+      Voluntary Context Switches        0
+      Involuntary Context Switches      0
+      Block Input Operations            0
+      Block Output Operations           0
+      
+501        /* new fields */
+502        /*Supplements*/
+
+
+503        proc sql;
+504        	connect using CCDS;
+505        	create table supplements as
+506        		select * from connection to ccds
+507        		(SELECT DISTINCT
+508        
+509        			clm.clm_nr
+510        			, clm.loss_dt
+511        			, clm.crt_dt
+512        			, incid.incid_ntrl_id
+513        			, assmt_src.assmt_src_nm
+514        
+515        		FROM
+516        
+517        			brfadm.CLM
+518        
+519        		left join brfadm.INCID on
+520        			clm.clm_ntrl_id = incid.clm_ntrl_id and incid.crnt_rec_in = 'Y' and incid.rec_ret_in = 'N'
+521        
+522        		inner join brfadm.ASSMT_SRC on
+523        			incid.incid_ntrl_id = assmt_src.incid_ntrl_id and assmt_src.crnt_rec_in = 'Y' and assmt_src.rec_ret_in = 'N'
+524        			and assmt_src.assmt_src_nm like ('Supplemental%')
+525        
+526        		where clm.crnt_rec_in = 'Y' and clm.rec_ret_in = 'N'
+527        			and assmt_src.assmt_src_nm like ('Supplemental%')
+528        
+529        			);
+NOTE: Table WORK.SUPPLEMENTS created, with 3164695 rows and 5 columns.
+
+530        	disconnect from ccds;
+531        quit;
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           7:23.25
+      user cpu time       1.47 seconds
+      system cpu time     1.05 seconds
+      memory              5349.93k
+      OS Memory           24224.00k
+      Timestamp           10/30/2026 10:56:01 AM
+      Step Count                        27  Switch Count  1
+      Page Faults                       6
+      Page Reclaims                     175
+      Page Swaps                        0
+      Voluntary Context Switches        19253
+      Involuntary Context Switches      2
+      Block Input Operations            0
+      Block Output Operations           1981088
+      
+
+532        /* turn into a count by incident number */
+533        proc sql;
+534        	create table supp_counts as
+535        		select incid_ntrl_id,
+536        			count(assmt_src_nm) as supplements
+537        		from supplements
+538        			group by incid_ntrl_id
+539        	;
+NOTE: Table WORK.SUPP_COUNTS created, with 1864818 rows and 2 columns.
+
+540        quit;
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           1.28 seconds
+      user cpu time       1.80 seconds
+      system cpu time     0.87 seconds
+      memory              904807.98k
+      OS Memory           923016.00k
+      Timestamp           10/30/2026 10:56:03 AM
+      Step Count                        28  Switch Count  2
+      Page Faults                       41
+      Page Reclaims                     192564
+      Page Swaps                        0
+      Voluntary Context Switches        29741
+      Involuntary Context Switches      186
+      Block Input Operations            0
+      Block Output Operations           58904
+      
+
+541        	
+542        /* merge it on */
+543        PROC SQL;
+544        	CREATE TABLE MDA_SVC As
+545        		Select A.*
+546        			, coalesce(B.supplements,0) as supplements
+547        			, min(coalesce(B.supplements,0),5) as supplements_cap5
+548        		From MDA_SVC as A left join supp_counts as B
+549        			on A.incid_ntrl_id = B.incid_ntrl_id
+550        	;
+ERROR: Column incid_ntrl_id could not be found in the table/view identified with the correlation name A.
+ERROR: Column incid_ntrl_id could not be found in the table/view identified with the correlation name A.
+ERROR: Expression using equals (=) has components that are of different data types.
+NOTE: PROC SQL set option NOEXEC and will continue to check the syntax of statements.
+551        QUIT;
+NOTE: The SAS System stopped processing this step because of errors.
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.00 seconds
+      user cpu time       0.00 seconds
+      system cpu time     0.00 seconds
+      memory              6283.96k
+      OS Memory           26280.00k
+      Timestamp           10/30/2026 10:56:03 AM
+      Step Count                        29  Switch Count  0
+      Page Faults                       1
+      Page Reclaims                     212
+      Page Swaps                        0
+      Voluntary Context Switches        0
+      Involuntary Context Switches      0
+      Block Input Operations            0
+      Block Output Operations           0
+      
+552        
+553        /*Rental is a service 																						   	 */
+554        
+
+
+555        proc sql ;
+556        	connect using CCDS;
+557        	create table rentals as
+558        	select * from connection to ccds
+559        	(
+560        	select distinct
+561        				  clm.clm_nr
+562        				, clm.clm_ntrl_id
+563        			 	, SPCL_SVC.svc_nm_txt
+564        			    , case
+565        -					when svc_req.sel_appr_typ_dc is null then SPCL_SVC.svc_nm_txt
+566        					else svc_req.sel_appr_typ_dc end as Svcs_AsgnTyp
+567        				, incid.INCID_NTRL_ID
+568        				,expsr.expsr_ntrl_id /* new one for merge */
+569        
+570        			FROM brfadm.svc_req
+571        
+572        	Left Join brfadm.clm
+573        		ON CLM.CLM_NTRL_ID = svc_req.CLM_NTRL_ID
+574        		AND clm.rec_ret_in = 'N' AND clm.crnt_rec_in = 'Y'
+575        
+576        	/* new one for merge */
+577        	LEFT JOIN 	brfadm.expsr
+578        		on clm.clm_ntrl_id = expsr.clm_ntrl_id
+579        		and clm.clmt_id = expsr.clmt_id /* trying to fix dupes - this from data dictionary */
+580        			and expsr.crnt_rec_in = 'Y' and expsr.rec_ret_in = 'N'
+581        
+582        	Left Join brfadm.INCID
+583        		ON CLM.CLM_NTRL_ID = INCID.CLM_NTRL_ID
+584        			AND INCID.rec_ret_in = 'N' AND INCID.crnt_rec_in = 'Y'	and INCID.SBTYP_DC in ('VehicleIncident')
+585        
+586        	Left Join brfadm.SVC_REQ_INSTR  SVC_REQ_INSTR
+587        		on svc_req.SVC_REQ_NTRL_ID = SVC_REQ_INSTR.SVC_REQ_NTRL_ID	and SVC_REQ_INSTR.crnt_rec_in= 'Y'
+588        
+589        	Left Join brfadm.SVC_REQ_INSTR_SVC
+590        		on SVC_REQ_INSTR.SVC_REQ_INSTR_NTRL_ID  = SVC_REQ_INSTR_SVC.SVC_REQ_INSTR_NTRL_ID
+591        		and SVC_REQ_INSTR_SVC.crnt_rec_in = 'Y'
+592        
+593        	inner Join brfadm.SPCL_SVC
+594        		on SVC_REQ_INSTR_SVC.SPCL_SVC_NTRL_ID = SPCL_SVC.SPCL_SVC_NTRL_ID
+595        		and SPCL_SVC.crnt_rec_in= 'Y' and SPCL_SVC.svc_nm_txt in ('Car rental')
+596        
+597        	where svc_req.CRNT_REC_IN = 'Y' and svc_req.PRGRS_DC  NOT IN  ( 'Declined','Canceled'  )
+598        		and svc_req.asgn_dt between to_date(&from_dt,'DDMONYYYY:HH24:MI:SS') AND to_date(&to_dt,'DDMONYYYY:HH24:MI:SS')
+599        
+600        );
+ERROR: ORACLE prepare error: ORA-00923: FROM keyword not found where expected. SQL statement: select distinct clm.clm_nr , 
+       clm.clm_ntrl_id , SPCL_SVC.svc_nm_txt , case - when svc_req.sel_appr_typ_dc is null then SPCL_SVC.svc_nm_txt else 
+       svc_req.sel_appr_typ_dc end as Svcs_AsgnTyp , incid.INCID_NTRL_ID ,expsr.expsr_ntrl_id FROM brfadm.svc_req Left Join 
+       brfadm.clm ON CLM.CLM_NTRL_ID = svc_req.CLM_NTRL_ID AND clm.rec_ret_in = 'N' AND clm.crnt_rec_in = 'Y' LEFT JOIN 
+       brfadm.expsr on clm.clm_ntrl_id = expsr.clm_ntrl_id and clm.clmt_id = expsr.clmt_id and expsr.crnt_rec_in = 'Y' and 
+       expsr.rec_ret_in = 'N' Left Join brfadm.INCID ON CLM.CLM_NTRL_ID = INCID.CLM_NTRL_ID AND INCID.rec_ret_in = 'N' AND 
+       INCID.crnt_rec_in = 'Y' and INCID.SBTYP_DC in ('VehicleIncident') Left Join brfadm.SVC_REQ_INSTR SVC_REQ_INSTR on 
+       svc_req.SVC_REQ_NTRL_ID = SVC_REQ_INSTR.SVC_REQ_NTRL_ID and SVC_REQ_INSTR.crnt_rec_in= 'Y' Left Join 
+       brfadm.SVC_REQ_INSTR_SVC on SVC_REQ_INSTR.SVC_REQ_INSTR_NTRL_ID = SVC_REQ_INSTR_SVC.SVC_REQ_INSTR_NTRL_ID and 
+       SVC_REQ_INSTR_SVC.crnt_rec_in = 'Y' inner Join brfadm.SPCL_SVC on SVC_REQ_INSTR_SVC.SPCL_SVC_NTRL_ID = 
+       SPCL_SVC.SPCL_SVC_NTRL_ID and SPCL_SVC.crnt_rec_in= 'Y' and SPCL_SVC.svc_nm_txt in ('Car rental') where svc_req.CRNT_REC_IN 
+       = 'Y' and svc_req.PRGRS_DC NOT IN ( 'Declined','Canceled' ) and svc_req.asgn_dt between 
+       to_date('01APRIL2023:00:00:00','DDMONYYYY:HH24:MI:SS') AND to_date('28OCTOBER2026:23:59:59','DDMONYYYY:HH24:MI:SS').
+NOTE: PROC SQL set option NOEXEC and will continue to check the syntax of statements.
+601        disconnect from ccds
+602        ;
+NOTE: Statement not executed due to NOEXEC option.
+602      !  quit;
+NOTE: The SAS System stopped processing this step because of errors.
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           1.76 seconds
+      user cpu time       0.01 seconds
+      system cpu time     0.00 seconds
+      memory              242.71k
+      OS Memory           20124.00k
+      Timestamp           10/30/2026 10:56:04 AM
+      Step Count                        30  Switch Count  0
+      Page Faults                       0
+      Page Reclaims                     28
+      Page Swaps                        0
+      Voluntary Context Switches        23
+      Involuntary Context Switches      0
+      Block Input Operations            0
+      Block Output Operations           24
+      
+603        
+
+
+604        PROC SQL;
+605        	CREATE TABLE rentals2 as
+606        		SELECT *
+607        			FROM rentals as A
+608        				WHERE A.INCID_NTRL_ID in (SELECT B.INCID_NTRL_ID from mda_svc as B);
+ERROR: File WORK.RENTALS.DATA does not exist.
+NOTE: PROC SQL set option NOEXEC and will continue to check the syntax of statements.
+609        QUIT;
+NOTE: The SAS System stopped processing this step because of errors.
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.00 seconds
+      user cpu time       0.00 seconds
+      system cpu time     0.00 seconds
+      memory              611.06k
+      OS Memory           20640.00k
+      Timestamp           10/30/2026 10:56:04 AM
+      Step Count                        31  Switch Count  0
+      Page Faults                       0
+      Page Reclaims                     77
+      Page Swaps                        0
+      Voluntary Context Switches        0
+      Involuntary Context Switches      0
+      Block Input Operations            0
+      Block Output Operations           0
+      
+610        
+
+
+611        proc sql;
+612        	create table rentals_dupe as
+613        		select *
+614        			from rentals
+615        				group by INCID_NTRL_ID
+616        					having count(*) gt 1;
+ERROR: File WORK.RENTALS.DATA does not exist.
+NOTE: PROC SQL set option NOEXEC and will continue to check the syntax of statements.
+617        quit;
+NOTE: The SAS System stopped processing this step because of errors.
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.00 seconds
+      user cpu time       0.00 seconds
+      system cpu time     0.00 seconds
+      memory              78.87k
+      OS Memory           20124.00k
+      Timestamp           10/30/2026 10:56:04 AM
+      Step Count                        32  Switch Count  0
+      Page Faults                       0
+      Page Reclaims                     9
+      Page Swaps                        0
+      Voluntary Context Switches        0
+      Involuntary Context Switches      0
+      Block Input Operations            0
+      Block Output Operations           0
+      
+618        	
+
+
+619        PROC SQL;
+620        	CREATE TABLE mda_svc As
+621        		Select A.*
+622        			, B.Svcs_AsgnTyp as rental
+623        		From mda_svc as A left join rentals as B
+624        			on A.INCID_NTRL_ID = B.INCID_NTRL_ID
+625        	;
+ERROR: File WORK.RENTALS.DATA does not exist.
+NOTE: PROC SQL set option NOEXEC and will continue to check the syntax of statements.
+626        QUIT;
+NOTE: The SAS System stopped processing this step because of errors.
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.00 seconds
+      user cpu time       0.00 seconds
+      system cpu time     0.00 seconds
+      memory              617.00k
+      OS Memory           20640.00k
+      Timestamp           10/30/2026 10:56:04 AM
+      Step Count                        33  Switch Count  0
+      Page Faults                       0
+      Page Reclaims                     77
+      Page Swaps                        0
+      Voluntary Context Switches        0
+      Involuntary Context Switches      2
+      Block Input Operations            0
+      Block Output Operations           0
+      
+627        
+628        /* create indicator */
+
+
+629        data mda_svc;
+630        	set mda_svc;
+631        	has_rental = 0;
+632        
+633        	if not missing(rental) then
+634        		has_rental = 1;
+635        run;
+
+NOTE: Variable rental is uninitialized.
+NOTE: There were 0 observations read from the data set WORK.MDA_SVC.
+NOTE: The data set WORK.MDA_SVC has 0 observations and 3 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      user cpu time       0.00 seconds
+      system cpu time     0.01 seconds
+      memory              1308.62k
+      OS Memory           21156.00k
+      Timestamp           10/30/2026 10:56:04 AM
+      Step Count                        34  Switch Count  1
+      Page Faults                       16
+      Page Reclaims                     216
+      Page Swaps                        0
+      Voluntary Context Switches        10
+      Involuntary Context Switches      0
+      Block Input Operations            0
+      Block Output Operations           536
+      
+
+636        
+637        /* end new features*/
+638        /* start creating fields */
+639        
+640        data mda_svc;
+641        	set mda_svc;
+642        	where ADJ_POS_DC in ('Material Damage Adjuster',
+643        		'Material Damage Inside Adjuster II',
+644        		'Material Damage Inside Adjuster I');
+ERROR: Variable ADJ_POS_DC is not on file WORK.MDA_SVC.
+645        	format svc_crt_date mmddyy10.;
+646        	svc_crt_date =datepart(SVC_CRT_DT);
+647        	svc_crt_year = year(datepart(SVC_CRT_DT));
+648        	svc_crt_month = month(datepart(SVC_CRT_DT));
+649        run;
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.MDA_SVC may be incomplete.  When this step was stopped there were 0 observations and 7 variables.
+WARNING: Data set WORK.MDA_SVC was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      user cpu time       0.00 seconds
+      system cpu time     0.00 seconds
+      memory              1286.40k
+      OS Memory           21156.00k
+      Timestamp           10/30/2026 10:56:04 AM
+      Step Count                        35  Switch Count  0
+      Page Faults                       9
+      Page Reclaims                     146
+      Page Swaps                        0
+      Voluntary Context Switches        0
+      Involuntary Context Switches      0
+      Block Input Operations            0
+      Block Output Operations           8
+      
+
+650        
+651        /* merge home zip codes of MDA adjusters */
+652        /* separate program (program 2 creates) */
+653        
+654        PROC SQL;
+655        	CREATE TABLE mda_svc As
+656        		Select A.*
+657        			, substr(B.postal,1,5) as adjuster_postal
+658        		From mda_svc as A left join src.zips as B
+659        			on a.adj_nm = B.name2
+660        	;
+ERROR: Column adj_nm could not be found in the table/view identified with the correlation name A.
+ERROR: Column adj_nm could not be found in the table/view identified with the correlation name A.
+NOTE: PROC SQL set option NOEXEC and will continue to check the syntax of statements.
+661        QUIT;
+NOTE: The SAS System stopped processing this step because of errors.
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.01 seconds
+      user cpu time       0.00 seconds
+      system cpu time     0.00 seconds
+      memory              6285.87k
+      OS Memory           26280.00k
+      Timestamp           10/30/2026 10:56:05 AM
+      Step Count                        36  Switch Count  0
+      Page Faults                       1
+      Page Reclaims                     147
+      Page Swaps                        0
+      Voluntary Context Switches        16
+      Involuntary Context Switches      0
+      Block Input Operations            544
+      Block Output Operations           0
+      
+662        					
+663        /* bring in vehicles within 20 miles of inspection zip code (made separately) */
+
+
+664        PROC SQL;
+665        	CREATE TABLE mda_svc As
+666        		Select A.*
+667        			, B.vehicles as vehicles_in_20mi
+668        		From mda_svc as A left join src.countbyzip20 as B
+669        			on A.pstl_cd = B.zip20
+670        	;
+ERROR: File SRC.COUNTBYZIP20.DATA does not exist.
+NOTE: PROC SQL set option NOEXEC and will continue to check the syntax of statements.
+671        QUIT;
+NOTE: The SAS System stopped processing this step because of errors.
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.00 seconds
+      user cpu time       0.00 seconds
+      system cpu time     0.00 seconds
+      memory              621.15k
+      OS Memory           20640.00k
+      Timestamp           10/30/2026 10:56:05 AM
+      Step Count                        37  Switch Count  0
+      Page Faults                       0
+      Page Reclaims                     78
+      Page Swaps                        0
+      Voluntary Context Switches        2
+      Involuntary Context Switches      0
+      Block Input Operations            0
+      Block Output Operations           0
+      
+672        
+673        /* if missing, use average */
+
+
+674        data mda_svc;
+675        	set mda_svc;
+676        
+677        	if missing(vehicles_in_20mi) then
+678        		vehicles_in_20mi = 70000;
+679        run;
+
+NOTE: There were 0 observations read from the data set WORK.MDA_SVC.
+NOTE: The data set WORK.MDA_SVC has 0 observations and 4 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      user cpu time       0.00 seconds
+      system cpu time     0.00 seconds
+      memory              1308.65k
+      OS Memory           21156.00k
+      Timestamp           10/30/2026 10:56:05 AM
+      Step Count                        38  Switch Count  1
+      Page Faults                       8
+      Page Reclaims                     213
+      Page Swaps                        0
+      Voluntary Context Switches        6
+      Involuntary Context Switches      0
+      Block Input Operations            0
+      Block Output Operations           528
+      
+
+679      !     		
+680        
+681        /* summarize counts by day */
+682        proc sql;
+683        	create table svc_presum as
+684        	select
+685        			ASGN_USR_ID,
+686        			SEL_APPR_TYP_DC,
+687        			count(SVC_REQ_NR) as services,
+688        			svc_crt_date
+689        	from mda_svc
+690        	group by ASGN_USR_ID, SEL_APPR_TYP_DC, svc_crt_date;
+ERROR: The following columns were not found in the contributing tables: ASGN_USR_ID, svc_crt_date, SVC_REQ_NR.
+NOTE: PROC SQL set option NOEXEC and will continue to check the syntax of statements.
+691        quit;
+NOTE: The SAS System stopped processing this step because of errors.
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.00 seconds
+      user cpu time       0.00 seconds
+      system cpu time     0.00 seconds
+      memory              5738.75k
+      OS Memory           25764.00k
+      Timestamp           10/30/2026 10:56:05 AM
+      Step Count                        39  Switch Count  0
+      Page Faults                       0
+      Page Reclaims                     80
+      Page Swaps                        0
+      Voluntary Context Switches        0
+      Involuntary Context Switches      0
+      Block Input Operations            0
+      Block Output Operations           0
+      
+692        
+693        /* combine records by date and create rolling sum */
+
+
+694        proc sql;
+695        	create table rolling_count as
+696        		select  ASGN_USR_ID,
+697        			svc_crt_date,
+698        			SEL_APPR_TYP_DC,
+699        			services,
+700        			sum(TMP) as services_roll7
+701        		from    (
+702        			select  A.*,
+703        				B.services as TMP
+704        			from    svc_presum A
+705        				left join svc_presum B
+706        					on      A.ASGN_USR_ID=B.ASGN_USR_ID
+707        					and 	A.SEL_APPR_TYP_DC=B.SEL_APPR_TYP_DC
+708        					and     A.svc_crt_date-7 <= B.svc_crt_date <= A.svc_crt_date
+709        					)
+710        				group by ASGN_USR_ID,
+711        					svc_crt_date,
+712        					SEL_APPR_TYP_DC,
+713        					services
+714        	;
+ERROR: File WORK.SVC_PRESUM.DATA does not exist.
+ERROR: File WORK.SVC_PRESUM.DATA does not exist.
+NOTE: PROC SQL set option NOEXEC and will continue to check the syntax of statements.
+715        quit;
+NOTE: The SAS System stopped processing this step because of errors.
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.00 seconds
+      user cpu time       0.01 seconds
+      system cpu time     0.00 seconds
+      memory              158.12k
+      OS Memory           20124.00k
+      Timestamp           10/30/2026 10:56:05 AM
+      Step Count                        40  Switch Count  0
+      Page Faults                       0
+      Page Reclaims                     9
+      Page Swaps                        0
+      Voluntary Context Switches        0
+      Involuntary Context Switches      0
+      Block Input Operations            0
+      Block Output Operations           0
+      
+716        
+717        /* transpose by service */
+
+
+718        proc transpose data=rolling_count out=rolling_count2;
+ERROR: File WORK.ROLLING_COUNT.DATA does not exist.
+719        	by ASGN_USR_ID svc_crt_date;
+720        	id SEL_APPR_TYP_DC;
+721        	var services_roll7;
+722        run;
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.ROLLING_COUNT2 may be incomplete.  When this step was stopped there were 0 observations and 0 variables.
+NOTE: PROCEDURE TRANSPOSE used (Total process time):
+      real time           0.00 seconds
+      user cpu time       0.00 seconds
+      system cpu time     0.01 seconds
+      memory              193.15k
+      OS Memory           20124.00k
+      Timestamp           10/30/2026 10:56:05 AM
+      Step Count                        41  Switch Count  1
+      Page Faults                       1
+      Page Reclaims                     47
+      Page Swaps                        0
+      Voluntary Context Switches        5
+      Involuntary Context Switches      0
+      Block Input Operations            0
+      Block Output Operations           168
+      
+723        
+724        /* fill in zeros */
+
+
+725        data rolling_count2;
+726        	set rolling_count2 (drop=_NAME_);
+ERROR: The variable _NAME_ in the DROP, KEEP, or RENAME list has never been referenced.
+ERROR: Invalid DROP, KEEP, or RENAME option on file WORK.ROLLING_COUNT2.
+727        	total_7 = sum(MaterialDamageAdjuster,DirectRepairProgram,IndependentAdjuster,
+728        		EstimateDeskReview,	OpenShop,PhotoAppraisal,Salvage);
+729        
+730        	/* fill in missings with zeroes */
+731        	array N[*] MaterialDamageAdjuster DirectRepairProgram IndependentAdjuster EstimateDeskReview
+732        		OpenShop PhotoAppraisal  Salvage;
+733        
+734        	do i=1 to hbound(N);
+735        		if N[i]=. then
+736        			N[i]=0;
+737        	end;
+738        run;
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.ROLLING_COUNT2 may be incomplete.  When this step was stopped there were 0 observations and 9 variables.
+WARNING: Data set WORK.ROLLING_COUNT2 was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      user cpu time       0.00 seconds
+      system cpu time     0.00 seconds
+      memory              763.09k
+      OS Memory           20640.00k
+      Timestamp           10/30/2026 10:56:05 AM
+      Step Count                        42  Switch Count  0
+      Page Faults                       11
+      Page Reclaims                     79
+      Page Swaps                        0
+      Voluntary Context Switches        0
+      Involuntary Context Switches      0
+      Block Input Operations            0
+      Block Output Operations           16
+      
+
+739        
+740        /* merge on to dataset */
+741        PROC SQL;
+742        	CREATE TABLE mda_svc As
+743        		Select A.*
+744        			, B.MaterialDamageAdjuster
+745        			, B.DirectRepairProgram
+746        			, B.IndependentAdjuster
+747        			, B.EstimateDeskReview
+748        			, B.OpenShop
+749        			, B.PhotoAppraisal
+750        			, b.salvage
+751        			, b.total_7
+752        		From mda_svc as A left join rolling_count2 as B
+753        			on A.ASGN_USR_ID = B.ASGN_USR_ID
+754        			and a.svc_crt_date = B.svc_crt_date
+755        	;
+ERROR: Table WORK.ROLLING_COUNT2 doesn't have any columns. PROC SQL requires each of its tables to have at least 1 column.
+ERROR: Column ASGN_USR_ID could not be found in the table/view identified with the correlation name A.
+ERROR: Column ASGN_USR_ID could not be found in the table/view identified with the correlation name A.
+ERROR: Column ASGN_USR_ID could not be found in the table/view identified with the correlation name B.
+ERROR: Column ASGN_USR_ID could not be found in the table/view identified with the correlation name B.
+ERROR: Column svc_crt_date could not be found in the table/view identified with the correlation name A.
+ERROR: Column svc_crt_date could not be found in the table/view identified with the correlation name A.
+ERROR: Column svc_crt_date could not be found in the table/view identified with the correlation name B.
+ERROR: Column svc_crt_date could not be found in the table/view identified with the correlation name B.
+ERROR: Column MaterialDamageAdjuster could not be found in the table/view identified with the correlation name B.
+ERROR: Column DirectRepairProgram could not be found in the table/view identified with the correlation name B.
+ERROR: Column IndependentAdjuster could not be found in the table/view identified with the correlation name B.
+ERROR: Column EstimateDeskReview could not be found in the table/view identified with the correlation name B.
+ERROR: Column OpenShop could not be found in the table/view identified with the correlation name B.
+ERROR: Column PhotoAppraisal could not be found in the table/view identified with the correlation name B.
+ERROR: Column salvage could not be found in the table/view identified with the correlation name B.
+ERROR: Column total_7 could not be found in the table/view identified with the correlation name B.
+NOTE: PROC SQL set option NOEXEC and will continue to check the syntax of statements.
+756        QUIT;
+NOTE: The SAS System stopped processing this step because of errors.
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.00 seconds
+      user cpu time       0.00 seconds
+      system cpu time     0.00 seconds
+      memory              5919.06k
+      OS Memory           25764.00k
+      Timestamp           10/30/2026 10:56:05 AM
+      Step Count                        43  Switch Count  0
+      Page Faults                       0
+      Page Reclaims                     80
+      Page Swaps                        0
+      Voluntary Context Switches        0
+      Involuntary Context Switches      0
+      Block Input Operations            0
+      Block Output Operations           8
+      
+757        
+758        /* append drive time */
+
+
+759        PROC SQL;
+760        	CREATE TABLE temp As
+761        		Select A.*
+762        			, B.drive_distance
+763        			, round(b.drive_time,5) as drivetime
+764        			, substr(A.pstl_cd,1,5) as zip5
+765        		From mda_svc as A left join src.drivetimes as B
+766        			on A.adjuster_postal = B.adj_zip
+767        			and substr(A.pstl_cd,1,5) = B.zip5_x;
+ERROR: Column adjuster_postal could not be found in the table/view identified with the correlation name A.
+ERROR: Column adjuster_postal could not be found in the table/view identified with the correlation name A.
+ERROR: Column pstl_cd could not be found in the table/view identified with the correlation name A.
+ERROR: Column pstl_cd could not be found in the table/view identified with the correlation name A.
+ERROR: Column pstl_cd could not be found in the table/view identified with the correlation name A.
+NOTE: PROC SQL set option NOEXEC and will continue to check the syntax of statements.
+768        quit;
+NOTE: The SAS System stopped processing this step because of errors.
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.00 seconds
+      user cpu time       0.00 seconds
+      system cpu time     0.00 seconds
+      memory              6290.62k
+      OS Memory           26280.00k
+      Timestamp           10/30/2026 10:56:05 AM
+      Step Count                        44  Switch Count  0
+      Page Faults                       0
+      Page Reclaims                     210
+      Page Swaps                        0
+      Voluntary Context Switches        10
+      Involuntary Context Switches      0
+      Block Input Operations            544
+      Block Output Operations           0
+      
+769        
+770        /* if inside adjuster or ia service, make this zero */
+771        /* they dont travel */
+
+
+772        data temp;
+773        	set temp;
+ERROR: File WORK.TEMP.DATA does not exist.
+774        
+775        	/* zero our for non-mda services */
+776        	if ADJ_POS_DC not in ('Material Damage Adjuster') or SEL_APPR_TYP_DC ne 'MaterialDamageAdjuster' then
+777        		do;
+778        			drive_distance = 0;
+779        			drivetime = 0;
+780        		end;
+781        
+782        	/* drivetime file does not do matching zip codes */
+783        	if missing(drive_distance)
+784        		and adjuster_postal = substr(pstl_cd,1,5)
+785        		and not missing(adjuster_postal) then
+786        		do;
+787        			drive_distance = 2;
+788        			drivetime = 5;
+789        		end;
+790        run;
+
+NOTE: Numeric values have been converted to character values at the places given by: (Line):(Column).
+      784:32   
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.TEMP may be incomplete.  When this step was stopped there were 0 observations and 6 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      user cpu time       0.00 seconds
+      system cpu time     0.00 seconds
+      memory              752.53k
+      OS Memory           20640.00k
+      Timestamp           10/30/2026 10:56:05 AM
+      Step Count                        45  Switch Count  1
+      Page Faults                       8
+      Page Reclaims                     141
+      Page Swaps                        0
+      Voluntary Context Switches        6
+      Involuntary Context Switches      0
+      Block Input Operations            0
+      Block Output Operations           536
+      
+
+791        
+792        /* separate hit and nohit */
+793        data good nogood (drop=drive_distance drivetime);
+794        	set temp;
+795        
+796        	if missing(drive_distance) then
+797        		output nogood;
+798        	else output good;
+799        run;
+
+NOTE: There were 0 observations read from the data set WORK.TEMP.
+NOTE: The data set WORK.GOOD has 0 observations and 6 variables.
+NOTE: The data set WORK.NOGOOD has 0 observations and 4 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      user cpu time       0.01 seconds
+      system cpu time     0.00 seconds
+      memory              1923.84k
+      OS Memory           21672.00k
+      Timestamp           10/30/2026 10:56:05 AM
+      Step Count                        46  Switch Count  2
+      Page Faults                       8
+      Page Reclaims                     343
+      Page Swaps                        0
+      Voluntary Context Switches        14
+      Involuntary Context Switches      0
+      Block Input Operations            0
+      Block Output Operations           1064
+      
+
+800        
+801        /*if missing, use average for inspection zip*/
+802        proc means data= good noprint nway missing;
+803        	var drive_distance drivetime;
+804        	class zip5;
+ERROR: Variable ZIP5 not found.
+805        	output out= zipavg (drop = _Freq_ _type_) mean=;
+806        	where ADJ_POS_DC = ('Material Damage Adjuster') and SEL_APPR_TYP_DC = 'MaterialDamageAdjuster';
+807        run;
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.ZIPAVG may be incomplete.  When this step was stopped there were 0 observations and 0 variables.
+NOTE: PROCEDURE MEANS used (Total process time):
+      real time           0.01 seconds
+      user cpu time       0.00 seconds
+      system cpu time     0.00 seconds
+      memory              655.53k
+      OS Memory           20640.00k
+      Timestamp           10/30/2026 10:56:05 AM
+      Step Count                        47  Switch Count  1
+      Page Faults                       12
+      Page Reclaims                     112
+      Page Swaps                        0
+      Voluntary Context Switches        24
+      Involuntary Context Switches      0
+      Block Input Operations            144
+      Block Output Operations           168
+      
+808        
+
+
+809        PROC SQL;
+810        	CREATE TABLE nogood As
+811        		Select A.*
+812        			, B.drive_distance
+813        			, round(b.drivetime,5) as drivetime
+814        		From nogood as A left join zipavg as B
+815        			on substr(A.pstl_cd,1,5) = B.zip5;
+ERROR: Table WORK.ZIPAVG doesn't have any columns. PROC SQL requires each of its tables to have at least 1 column.
+ERROR: Column zip5 could not be found in the table/view identified with the correlation name B.
+ERROR: Column zip5 could not be found in the table/view identified with the correlation name B.
+ERROR: Column drive_distance could not be found in the table/view identified with the correlation name B.
+ERROR: Column drivetime could not be found in the table/view identified with the correlation name B.
+ERROR: Function SUBSTR requires a character expression as argument 1.
+ERROR: Function ROUND requires a numeric expression as argument 1.
+NOTE: PROC SQL set option NOEXEC and will continue to check the syntax of statements.
+816        quit;
+NOTE: The SAS System stopped processing this step because of errors.
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.00 seconds
+      user cpu time       0.00 seconds
+      system cpu time     0.01 seconds
+      memory              5926.53k
+      OS Memory           25764.00k
+      Timestamp           10/30/2026 10:56:05 AM
+      Step Count                        48  Switch Count  0
+      Page Faults                       0
+      Page Reclaims                     80
+      Page Swaps                        0
+      Voluntary Context Switches        0
+      Involuntary Context Switches      0
+      Block Input Operations            0
+      Block Output Operations           0
+      
+817        					
+818        /* stack */
+
+
+819        data mdata;
+820        	set good nogood;
+821        
+822        	/* set to overall average */
+823        	if missing(drive_distance) then
+824        		do;
+825        			drive_distance = 25;
+826        			drivetime = 40;
+827        		end;
+828        run;
+
+NOTE: There were 0 observations read from the data set WORK.GOOD.
+NOTE: There were 0 observations read from the data set WORK.NOGOOD.
+NOTE: The data set WORK.MDATA has 0 observations and 6 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      user cpu time       0.00 seconds
+      system cpu time     0.00 seconds
+      memory              1921.84k
+      OS Memory           21672.00k
+      Timestamp           10/30/2026 10:56:05 AM
+      Step Count                        49  Switch Count  1
+      Page Faults                       8
+      Page Reclaims                     283
+      Page Swaps                        0
+      Voluntary Context Switches        6
+      Involuntary Context Switches      0
+      Block Input Operations            0
+      Block Output Operations           528
+      
+
+829        
+830        /* calculate branch staffing level */
+831        /* calculate employee counts */
+832        PROC SQL;
+833        	CREATE TABLE employees As
+834        		Select
+835        			svc_crt_year
+836        			,svc_crt_month
+837        			,usr_rpt_brnch_dc
+838        			,ADJ_POS_DC
+839        			,count (distinct ADJ_NM) as emp_count
+840        
+841        		From mdata as A
+842        		group by
+843        			svc_crt_year
+844        			,svc_crt_month
+845        			,usr_rpt_brnch_dc
+846        			,ADJ_POS_DC
+847        		;
+ERROR: The following columns were not found in the contributing tables: ADJ_NM, svc_crt_month, svc_crt_year, usr_rpt_brnch_dc.
+NOTE: PROC SQL set option NOEXEC and will continue to check the syntax of statements.
+848        QUIT;
+NOTE: The SAS System stopped processing this step because of errors.
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.00 seconds
+      user cpu time       0.00 seconds
+      system cpu time     0.00 seconds
+      memory              5737.84k
+      OS Memory           25764.00k
+      Timestamp           10/30/2026 10:56:05 AM
+      Step Count                        50  Switch Count  0
+      Page Faults                       0
+      Page Reclaims                     78
+      Page Swaps                        0
+      Voluntary Context Switches        0
+      Involuntary Context Switches      0
+      Block Input Operations            0
+      Block Output Operations           8
+      
+849        
+850        /* append employee count */
+
+
+851        PROC SQL;
+852        	CREATE TABLE mdata As
+853        		Select A.*
+854        			, min(B.emp_count,40) as br_pos_emp_count
+855        		From mdata as A left join employees as B
+856        			on A.svc_crt_year = B.svc_crt_year
+857        			and A.svc_crt_month = B.svc_crt_month
+858        			and A.usr_rpt_brnch_dc = B.usr_rpt_brnch_dc
+859        			and A.ADJ_POS_DC = B.ADJ_POS_DC
+860        	;
+ERROR: File WORK.EMPLOYEES.DATA does not exist.
+NOTE: PROC SQL set option NOEXEC and will continue to check the syntax of statements.
+861        QUIT;
+NOTE: The SAS System stopped processing this step because of errors.
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.00 seconds
+      user cpu time       0.00 seconds
+      system cpu time     0.00 seconds
+      memory              618.15k
+      OS Memory           20640.00k
+      Timestamp           10/30/2026 10:56:05 AM
+      Step Count                        51  Switch Count  0
+      Page Faults                       0
+      Page Reclaims                     77
+      Page Swaps                        0
+      Voluntary Context Switches        0
+      Involuntary Context Switches      0
+      Block Input Operations            0
+      Block Output Operations           0
+      
+862        
+
+
+863        data mdata;
+864        	set mdata;
+865        	length 	VEH_STYL_DC_grp $20.
+866        		DRVR_INSD_REL_TYP_DC_grp $8.
+867        		make_grp $9.
+868        		LOB_grp $8.
+869        		Veh_USE_RSN_DC_grp $10.
+870        		coll_pnt_grp $12.;
+871        
+872        	/* CREATE TARGET VARIABLE - elapsed time  */
+873        	elaps = round(((EVNT_DT - SVC_CRT_DT)/86400),.001);
+874        
+875        	/* adjust dates to remove weekends */
+876        	days_full = datepart(EVNT_DT)-datepart(SVC_CRT_DT);
+877        	days_nowknd = intck('WEEKDAY', datepart(SVC_CRT_DT), datepart(EVNT_DT));
+878        	diff = days_full - days_nowknd;
+879        	elaps2 = elaps - diff;
+880        
+881        	/* cap */
+882        	elaps3 = max(elaps2,0);
+883        
+884        	if sel_appr_typ_dc = 'PhotoAppraisal' then
+885        		elaps3 = min(elaps3,8);
+886        	else if sel_appr_typ_dc in ('IndependentAdjuster','MaterialDamageAdjuster','OpenShop') then
+887        		elaps3 = min(elaps3,20);
+888        	else if sel_appr_typ_dc in ('DirectRepairProgram','EstimateDeskReview') then
+889        		elaps3 = min(elaps3,30);
+890        	else if sel_appr_typ_dc = 'Salvage' then
+891        		elaps3 = min(elaps3,120);
+892        	MAKE_NM = upcase(MAKE_NM);
+893        	MAKE_NM2 = substr(upcase(MAKE_NM),1,4);
+894        
+895        	/* relationship */
+896        	if missing(DRVR_INSD_REL_TYP_DC) then
+897        		DRVR_INSD_REL_TYP_DC = 'Other';
+898        
+899        	/* too many levels */
+900        	if DRVR_INSD_REL_TYP_DC in ('Self','Child','Spouse','Other','Relative') then
+901        		DRVR_INSD_REL_TYP_DC_grp = DRVR_INSD_REL_TYP_DC;
+902        	else if DRVR_INSD_REL_TYP_DC = 'DomesticPartner' then
+903        		DRVR_INSD_REL_TYP_DC_grp = 'Spouse';
+904        	else if DRVR_INSD_REL_TYP_DC = 'Parent' then
+905        		DRVR_INSD_REL_TYP_DC_grp = 'Relative';
+906        	else if DRVR_INSD_REL_TYP_DC = 'Grandparent' then
+907        		DRVR_INSD_REL_TYP_DC_grp = 'Relative';
+908        	else DRVR_INSD_REL_TYP_DC_grp = 'Other';
+909        
+910        	/* not sure keeping */
+911        	if VEH_STYL_DC in ('DumpTruck','BoxTruck','TractorTrailer','TractorOnly','Bus','ConstructionVehicle',
+912        		'StraightTruck','GarbageTruck','CarTransporter','CementMixer') then
+913        		VEH_STYL_DC_grp = 'Truck';
+914        	else if VEH_STYL_DC in ('Boat','AllTerrainVehicle','','Snowmobile','GolfCart','Crane','RecreationalVehicle','Trailer')
+914      ! then
+915        		VEH_STYL_DC_grp = 'Other';
+916        	else VEH_STYL_DC_grp = VEH_STYL_DC;
+917        
+918        	/* cleanup makename and group */
+919        	if substr(upcase(MAKE_NM),1,4) in ('FORD','CHEV','TOYO','HOND','NISS','JEEP','HYUN','SUBA',
+920        		'DODG','GMC','KIA','RAM','BUIC','LEXU','CHRY','MAZD','VOLK',
+921        		'BMW','CADI') /* 20 most common */
+922        	then
+923        
+924        		do;
+925        			make_grp = 'common';
+926        			make_nm2 = substr(upcase(MAKE_NM),1,4);
+927        		end;
+928        	else
+929        		do;
+930        			make_grp = 'un-common';
+931        			make_nm2 = 'OTHE';
+932        		end;
+933        
+934        	/* make month legit categorical */
+935        	month = month(datepart(SVC_CRT_DT));
+936        
+937        	if month = 1 then
+938        		monthc = 'Jan';
+939        	else if month = 2 then
+940        		monthc = 'Feb';
+941        	else if month = 3 then
+942        		monthc = 'Mar';
+943        	else if month = 4 then
+944        		monthc = 'Apr';
+945        	else if month = 5 then
+946        		monthc = 'May';
+947        	else if month = 6 then
+948        		monthc = 'Jun';
+949        	else if month = 7 then
+950        		monthc = 'Jul';
+951        	else if month = 8 then
+952        		monthc = 'Aug';
+953        	else if month = 9 then
+954        		monthc = 'Sep';
+955        	else if month = 10 then
+956        		monthc = 'Oct';
+957        	else if month = 11 then
+958        		monthc = 'Nov';
+959        	else if month = 12 then
+960        		monthc = 'Dec';
+961        
+962        	/* collision point */
+963        	if COL_PNT_TYP_DC2 in ('Glass','Vandalized','Hail') then
+964        		coll_pnt_grp = "superficial";
+965        	else if COL_PNT_TYP_DC2 in ('Right rear','Left rear','Right quarter post','Left quarter post')
+966        		then
+967        		coll_pnt_grp = "rear-side";
+968        	else if COL_PNT_TYP_DC2 in ('Right front pillar','Left front pillar','Right front','Left front')
+969        		then
+970        		coll_pnt_grp = "frontside";
+971        	else if COL_PNT_TYP_DC2 in ('Rear') then
+972        		coll_pnt_grp = 'rear';
+973        	else if COL_PNT_TYP_DC2 in ('Left T-Bone','Right T-Bone','Undercarriage') then
+974        		coll_pnt_grp = "Tbone/Under";
+975        	else if COL_PNT_TYP_DC2 in ('Non-collision (comprehensive loss)') then
+976        		coll_pnt_grp = "Comp";
+977        	else if COL_PNT_TYP_DC2 in ('Front') then
+978        		coll_pnt_grp = "Front";
+979        	else if COL_PNT_TYP_DC2 in ('Left & Right side','All over','Front & Rear') then
+980        		coll_pnt_grp = "Multiple";
+981        	else if COL_PNT_TYP_DC2 in ('Total loss','Fresh water','Engine burn','Rollover','Interior burn',
+982        		'Total burn','Strip','Salt water','')
+983        		then
+984        		coll_pnt_grp = "Extensive";
+985        
+986        	/* cleanup modelyear */
+987        	veh_age = min(max(svc_crt_year- mfr_yr,0),25);
+988        
+989        	/* good enough for now */
+990        	/* Veh_USE_RSN_DC: business vs other groupings 0|1 */
+991        	if Veh_USE_RSN_DC = 'Business' then
+992        		Veh_USE_RSN_DC_grp = 'Business';
+993        	else Veh_USE_RSN_DC_grp = 'Other';
+994        
+995        	/* line of business */
+996        	if LOB_DC = "BusinessAutoLine" then
+997        		LOB_grp = 'BusAuto';
+998        	else if LOB_DC = "PersonalAutoLine" then
+999        		LOB_grp = 'PersAuto';
+1000       	else LOB_grp = 'Other';
+1001       
+1002       	/*	-	Combine LIEN_LEAS_DC and make a 0|1 if Lease or Lien then 1 else 0. */
+1003       	lien_lease = 1;
+1004       
+1005       	if missing(LIEN_LEAS_DC) then
+1006       		lien_lease = 0;
+1007       run;
+
+NOTE: Numeric values have been converted to character values at the places given by: (Line):(Column).
+      892:19   893:27   901:30   919:19   926:29   
+NOTE: Character values have been converted to numeric values at the places given by: (Line):(Column).
+      892:12   897:26   900:5    902:33   904:33   906:33   
+NOTE: Variable SVC_CRT_DT is uninitialized.
+NOTE: Variable EVNT_DT is uninitialized.
+NOTE: Variable VEH_STYL_DC is uninitialized.
+NOTE: Variable COL_PNT_TYP_DC2 is uninitialized.
+NOTE: Variable mfr_yr is uninitialized.
+NOTE: Variable svc_crt_year is uninitialized.
+NOTE: Variable Veh_USE_RSN_DC is uninitialized.
+NOTE: Variable LOB_DC is uninitialized.
+NOTE: Variable LIEN_LEAS_DC is uninitialized.
+NOTE: There were 0 observations read from the data set WORK.MDATA.
+NOTE: The data set WORK.MDATA has 0 observations and 34 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.01 seconds
+      user cpu time       0.01 seconds
+      system cpu time     0.00 seconds
+      memory              1557.78k
+      OS Memory           21156.00k
+      Timestamp           10/30/2026 10:56:05 AM
+      Step Count                        52  Switch Count  1
+      Page Faults                       24
+      Page Reclaims                     268
+      Page Swaps                        0
+      Voluntary Context Switches        15
+      Involuntary Context Switches      0
+      Block Input Operations            8
+      Block Output Operations           560
+      
+
+1008       
+1009       /* need to cut this down to the variables actually used */
+1010       /* save */
+1011       data mdl_curr.for_pythonscoring;
+1012       	set mdata;
+1013       
+1014       		keep
+1015       
+1016       		/* bonus for step 6 */
+1017       		ADJ_POS_DC
+1018       
+1019       		/* target */
+1020       		elaps3
+1021       
+1022       		/* key */
+1023       		SVC_REQ_NR
+1024       		adj_nm
+1025       		EVNT_DT
+1026       
+1027       		/*# nuisance */
+1028       		USR_RPT_BRNCH_DC
+1029       
+1030       		/*# vehicle info */
+1031       		veh_age
+1032       		lien_lease
+1033       		VEH_OPR_IN
+1034       		make_grp
+1035       		VEH_STYL_DC_grp
+1036       
+1037       		/*# service area info */
+1038       		vehicles_in_20mi
+1039       		br_pos_emp_count
+1040       		drivetime
+1041       		
+1042       		/*# incident info*/
+1043       		coll_pnt_grp
+1044       		DRVR_INSD_REL_TYP_DC
+1045       		LOB_grp
+1046       		
+1047       		/*# appraisal info*/
+1048       		SEL_APPR_TYP_DC
+1049       		monthc
+1050       		
+1051       		/*# workload*/
+1052       		DirectRepairProgram
+1053       		MaterialDamageAdjuster
+1054       		IndependentAdjuster
+1055       		EstimateDeskReview
+1056       		PhotoAppraisal
+1057       		
+1058       		/*# evaluate*/
+1059       		supplements
+1060       		has_rental
+1061       
+1062       		;
+1063       run;
+
+WARNING: The variable SVC_REQ_NR in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable adj_nm in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable USR_RPT_BRNCH_DC in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable VEH_OPR_IN in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable vehicles_in_20mi in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable br_pos_emp_count in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable DirectRepairProgram in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable MaterialDamageAdjuster in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable IndependentAdjuster in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable EstimateDeskReview in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable PhotoAppraisal in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable supplements in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable has_rental in the DROP, KEEP, or RENAME list has never been referenced.
+NOTE: There were 0 observations read from the data set WORK.MDATA.
+NOTE: The data set MDL_CURR.FOR_PYTHONSCORING has 0 observations and 13 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.02 seconds
+      user cpu time       0.00 seconds
+      system cpu time     0.01 seconds
+      memory              1372.28k
+      OS Memory           21156.00k
+      Timestamp           10/30/2026 10:56:05 AM
+      Step Count                        53  Switch Count  1
+      Page Faults                       6
+      Page Reclaims                     216
+      Page Swaps                        0
+      Voluntary Context Switches        39
+      Involuntary Context Switches      0
+      Block Input Operations            32
+      Block Output Operations           528
+      
+
+1064       
+1065       %macro ExportCustom();
+1066       
+1067       %if &flag. = 1 %then %do;
+1068       	/* excel output */
+1069       	proc export data=mdl_curr.for_pythonscoring
+1070       		outfile="/ere/local/shared/actuarial/Share/Claims/WPC/Material Damage/executable/Output/CBscoringv2.csv"
+1071       		dbms=csv
+1072       		replace;
+1073       	run;
+1074       
+1075       
+1076       %end;
+1077       %else %do;
+1078       
+1079       	/* excel output */
+1080       	proc export data=mdl_curr.for_pythonscoring
+1081       		outfile="&output_path_csv/CBscoringv2.csv"
+1082       		dbms=csv
+1083       		replace;
+1084       	run;
+1085       %end;
+1086       
+1087       
+1088       %mend ExportCustom;
+1089       
+1090       %ExportCustom();
+
+NOTE: Unable to open parameter catalog: SASUSER.PARMS.PARMS.SLIST in update mode. Temporary parameter values will be saved to 
+WORK.PARMS.PARMS.SLIST.
+NOTE: No observations in data set MDL_CURR.FOR_PYTHONSCORING.
+NOTE: Data set has 0 observations.
+1091        /**********************************************************************
+1092        *   PRODUCT:   SAS
+1093        *   VERSION:   9.4
+1094        *   CREATOR:   External File Interface
+1095        *   DATE:      30OCT26
+1096        *   DESC:      Generated SAS Datastep Code
+1097        *   TEMPLATE SOURCE:  (None Specified.)
+1098        ***********************************************************************/
+1099           data _null_;
+1100           %let _EFIERR_ = 0; /* set the ERROR detection macro variable */
+1101           %let _EFIREC_ = 0;     /* clear export record count macro variable */
+1102           file '/ere/local/shared/actuarial/Share/Claims/WPC/TESTING 2/Material Damage V2/2026/10-28-2026/CBscoringv2.csv'
+1102     ! delimiter=',' DSD DROPOVER lrecl=32767;
+1103           if _n_ = 1 then        /* write column names or labels */
+1104            do;
+1105              put
+1106                 "ADJ_POS_DC"
+1107              ','
+1108                 "SEL_APPR_TYP_DC"
+1109              ','
+1110                 "drivetime"
+1111              ','
+1112                 "VEH_STYL_DC_grp"
+1113              ','
+1114                 "make_grp"
+1115              ','
+1116                 "LOB_grp"
+1117              ','
+1118                 "coll_pnt_grp"
+1119              ','
+1120                 "EVNT_DT"
+1121              ','
+1122                 "elaps3"
+1123              ','
+1124                 "DRVR_INSD_REL_TYP_DC"
+1125              ','
+1126                 "monthc"
+1127              ','
+1128                 "veh_age"
+1129              ','
+1130                 "lien_lease"
+1131              ;
+1132            end;
+1133          set  MDL_CURR.FOR_PYTHONSCORING   end=EFIEOD;
+1134              format ADJ_POS_DC $8. ;
+1135              format SEL_APPR_TYP_DC $22. ;
+1136              format drivetime best12. ;
+1137              format VEH_STYL_DC_grp $20. ;
+1138              format make_grp $9. ;
+1139              format LOB_grp $8. ;
+1140              format coll_pnt_grp $12. ;
+1141              format EVNT_DT best12. ;
+1142              format elaps3 best12. ;
+1143              format DRVR_INSD_REL_TYP_DC best12. ;
+1144              format monthc $3. ;
+1145              format veh_age best12. ;
+1146              format lien_lease best12. ;
+1147            do;
+1148              EFIOUT + 1;
+1149              put ADJ_POS_DC $ @;
+1150              put SEL_APPR_TYP_DC $ @;
+1151              put drivetime @;
+1152              put VEH_STYL_DC_grp $ @;
+1153              put make_grp $ @;
+1154              put LOB_grp $ @;
+1155              put coll_pnt_grp $ @;
+1156              put EVNT_DT @;
+1157              put elaps3 @;
+1158              put DRVR_INSD_REL_TYP_DC @;
+1159              put monthc $ @;
+1160              put veh_age @;
+1161              put lien_lease ;
+1162              ;
+1163            end;
+1164           if _ERROR_ then call symputx('_EFIERR_',1);  /* set ERROR detection macro variable */
+1165           if EFIEOD then call symputx('_EFIREC_',EFIOUT);
+1166           run;
+
+NOTE: The file '/ere/local/shared/actuarial/Share/Claims/WPC/TESTING 2/Material Damage V2/2026/10-28-2026/CBscoringv2.csv' is:
+      Filename=/ere/local/shared/actuarial/Share/Claims/WPC/TESTING 2/Material Damage V2/2026/10-28-2026/CBscoringv2.csv,
+      Owner Name=xh787,Group Name=domain users,
+      Access Permission=-rwx------,
+      Last Modified=30Oct2026:10:56:05
+
+NOTE: 1 record was written to the file '/ere/local/shared/actuarial/Share/Claims/WPC/TESTING 2/Material Damage 
+      V2/2026/10-28-2026/CBscoringv2.csv'.
+      The minimum record length was 144.
+      The maximum record length was 144.
+NOTE: There were 0 observations read from the data set MDL_CURR.FOR_PYTHONSCORING.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      user cpu time       0.00 seconds
+      system cpu time     0.00 seconds
+      memory              10559.53k
+      OS Memory           29648.00k
+      Timestamp           10/30/2026 10:56:05 AM
+      Step Count                        54  Switch Count  0
+      Page Faults                       10
+      Page Reclaims                     114
+      Page Swaps                        0
+      Voluntary Context Switches        6
+      Involuntary Context Switches      0
+      Block Input Operations            0
+      Block Output Operations           16
+      
+
+0 records created in /ere/local/shared/actuarial/Share/Claims/WPC/TESTING 2/Material Damage V2/2026/10-28-2026/CBscoringv2.csv from 
+MDL_CURR.FOR_PYTHONSCORING.
+  
+  
+NOTE: "/ere/local/shared/actuarial/Share/Claims/WPC/TESTING 2/Material Damage V2/2026/10-28-2026/CBscoringv2.csv" file was 
+      successfully created.
+NOTE: PROCEDURE EXPORT used (Total process time):
+      real time           0.12 seconds
+      user cpu time       0.02 seconds
+      system cpu time     0.02 seconds
+      memory              10808.59k
+      OS Memory           30164.00k
+      Timestamp           10/30/2026 10:56:05 AM
+      Step Count                        54  Switch Count  7
+      Page Faults                       596
+      Page Reclaims                     2660
+      Page Swaps                        0
+      Voluntary Context Switches        176
+      Involuntary Context Switches      1
+      Block Input Operations            1096
+      Block Output Operations           128
+      
+
+1167       
+1168       
+1169       
+1170       
+1171       
+1172       
+1173       
+1174       
+1175       
+1176       
+1177       
+1178       
+1179       
+1180       
+1181       
+1182       
+1183       
+1184       
+1185       
+1186       
+1187       ;*';*";*/;quit;run;
+1188                       ods html5 (id=saspy_internal) close;
+1189                       ods listing;
+1190       

@@ -1,0 +1,294 @@
+8                                                          The SAS System                             09:40 Friday, October 30, 2026
+
+249        
+250                        ods listing close;
+251                        ods html5 (id=saspy_internal) options(bitmap_mode='inline')
+252                            file="/saswork/SAS_work213F003B408E_prdsasgridn11/SAS_workA159003B408E_prdsasgridn11/saspy_results.ht
+252      ! ml"
+253                            device=svg
+254                            style=HTMLBlue;
+NOTE: Writing HTML5(SASPY_INTERNAL) Body file: 
+      /saswork/SAS_work213F003B408E_prdsasgridn11/SAS_workA159003B408E_prdsasgridn11/saspy_results.html
+255                        ods graphics on / outputfmt=png;
+256                    ;*';*";*/;quit;run;/* Material Damage SAS Script 2 : Adjuster Addresses v2*/
+257        
+258        /* because of file layout, must open file and create a named range of the actual
+259        	data called 'adj' in excel formulas/data range*/
+260        
+261        /* import file */
+262        PROC IMPORT DATAFILE= '/ere/local/shared/actuarial/Share/Claims/WPC/hrisaddr.xlsx'
+263        	DBMS=XLSX replace
+264        	OUT=addrs;
+265        	GETNAMES=YES;
+266        	SHEET='Sheet1';
+267        RUN;
+
+NOTE: One or more variables were converted because the data type is not supported by the V9 engine. For more details, run with 
+      options MSGLEVEL=I.
+NOTE: The import data set has 1013 observations and 6 variables.
+NOTE: WORK.ADDRS data set was successfully created.
+NOTE: PROCEDURE IMPORT used (Total process time):
+      real time           0.04 seconds
+      user cpu time       0.03 seconds
+      system cpu time     0.00 seconds
+      memory              3944.71k
+      OS Memory           22260.00k
+      Timestamp           10/30/2026 09:40:28 AM
+      Step Count                        12  Switch Count  1
+      Page Faults                       0
+      Page Reclaims                     834
+      Page Swaps                        0
+      Voluntary Context Switches        17
+      Involuntary Context Switches      2
+      Block Input Operations            120
+      Block Output Operations           528
+      
+
+268        
+269        %changeColFormat2Char(addrs, EMPLID|Name|'Job Title'n|'Division/Field Office'n|Postal|Location, $50.)
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.00 seconds
+      user cpu time       0.00 seconds
+      system cpu time     0.00 seconds
+      memory              5228.62k
+      OS Memory           24480.00k
+      Timestamp           10/30/2026 09:40:28 AM
+      Step Count                        13  Switch Count  0
+      Page Faults                       59
+      Page Reclaims                     135
+      Page Swaps                        0
+      Voluntary Context Switches        9
+      Involuntary Context Switches      0
+      Block Input Operations            24
+      Block Output Operations           0
+      
+
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.00 seconds
+      user cpu time       0.00 seconds
+      system cpu time     0.01 seconds
+      memory              5228.62k
+      OS Memory           24480.00k
+      Timestamp           10/30/2026 09:40:28 AM
+      Step Count                        14  Switch Count  0
+      Page Faults                       0
+      Page Reclaims                     101
+      Page Swaps                        0
+      Voluntary Context Switches        0
+      Involuntary Context Switches      0
+      Block Input Operations            0
+      Block Output Operations           0
+      
+
+NOTE: No rows were selected.
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.00 seconds
+      user cpu time       0.00 seconds
+      system cpu time     0.00 seconds
+      memory              5228.62k
+      OS Memory           24480.00k
+      Timestamp           10/30/2026 09:40:28 AM
+      Step Count                        15  Switch Count  0
+      Page Faults                       1
+      Page Reclaims                     102
+      Page Swaps                        0
+      Voluntary Context Switches        0
+      Involuntary Context Switches      0
+      Block Input Operations            0
+      Block Output Operations           0
+      
+
+NOTE: No rows were selected.
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.00 seconds
+      user cpu time       0.00 seconds
+      system cpu time     0.00 seconds
+      memory              5228.62k
+      OS Memory           24480.00k
+      Timestamp           10/30/2026 09:40:28 AM
+      Step Count                        16  Switch Count  0
+      Page Faults                       0
+      Page Reclaims                     100
+      Page Swaps                        0
+      Voluntary Context Switches        0
+      Involuntary Context Switches      0
+      Block Input Operations            0
+      Block Output Operations           0
+      
+
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.00 seconds
+      user cpu time       0.00 seconds
+      system cpu time     0.00 seconds
+      memory              5228.62k
+      OS Memory           24480.00k
+      Timestamp           10/30/2026 09:40:28 AM
+      Step Count                        17  Switch Count  0
+      Page Faults                       0
+      Page Reclaims                     100
+      Page Swaps                        0
+      Voluntary Context Switches        0
+      Involuntary Context Switches      0
+      Block Input Operations            0
+      Block Output Operations           0
+      
+
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.00 seconds
+      user cpu time       0.00 seconds
+      system cpu time     0.00 seconds
+      memory              5228.62k
+      OS Memory           24480.00k
+      Timestamp           10/30/2026 09:40:28 AM
+      Step Count                        18  Switch Count  0
+      Page Faults                       0
+      Page Reclaims                     100
+      Page Swaps                        0
+      Voluntary Context Switches        0
+      Involuntary Context Switches      0
+      Block Input Operations            0
+      Block Output Operations           0
+      
+
+270        
+271        
+272        /* drop middle initial */
+273        
+274        data addrs
+275               (keep=name2 postal);
+276        		set addrs;
+277        	/*	if last position is . then trim by 2 */
+278        		if length(scan(name, -1, '.')) = 1
+279        			then name2 = compress(substr(name,1,length(name)-2));
+280        	/* if last position is capital letter, trim by 2 */
+281        		else if substr(name,length(name)-1,1) = substr(upcase(name),length(name)-1,1)
+282        			then name2 = compress(substr(name,1,length(name)-1));
+283        	/*otherwise keep as is */
+284        		else name2 = compress(name);
+285        	run;
+
+NOTE: Invalid third argument to function SUBSTR at line 279 column 26.
+EMPLID=  Name=  Job Title=  Division/Field Office=  Postal=  Location=  name2=  _ERROR_=1 _N_=913
+NOTE: Invalid third argument to function SUBSTR at line 279 column 26.
+EMPLID=  Name=  Job Title=  Division/Field Office=  Postal=  Location=  name2=  _ERROR_=1 _N_=914
+NOTE: Invalid third argument to function SUBSTR at line 279 column 26.
+EMPLID=  Name=  Job Title=  Division/Field Office=  Postal=  Location=  name2=  _ERROR_=1 _N_=915
+NOTE: Invalid third argument to function SUBSTR at line 279 column 26.
+EMPLID=  Name=  Job Title=  Division/Field Office=  Postal=  Location=  name2=  _ERROR_=1 _N_=916
+NOTE: Invalid third argument to function SUBSTR at line 279 column 26.
+EMPLID=  Name=  Job Title=  Division/Field Office=  Postal=  Location=  name2=  _ERROR_=1 _N_=917
+NOTE: Invalid third argument to function SUBSTR at line 279 column 26.
+EMPLID=  Name=  Job Title=  Division/Field Office=  Postal=  Location=  name2=  _ERROR_=1 _N_=918
+NOTE: Invalid third argument to function SUBSTR at line 279 column 26.
+EMPLID=  Name=  Job Title=  Division/Field Office=  Postal=  Location=  name2=  _ERROR_=1 _N_=919
+NOTE: Invalid third argument to function SUBSTR at line 279 column 26.
+EMPLID=  Name=  Job Title=  Division/Field Office=  Postal=  Location=  name2=  _ERROR_=1 _N_=920
+NOTE: Invalid third argument to function SUBSTR at line 279 column 26.
+EMPLID=  Name=  Job Title=  Division/Field Office=  Postal=  Location=  name2=  _ERROR_=1 _N_=921
+NOTE: Invalid third argument to function SUBSTR at line 279 column 26.
+EMPLID=  Name=  Job Title=  Division/Field Office=  Postal=  Location=  name2=  _ERROR_=1 _N_=922
+NOTE: Invalid third argument to function SUBSTR at line 279 column 26.
+EMPLID=  Name=  Job Title=  Division/Field Office=  Postal=  Location=  name2=  _ERROR_=1 _N_=923
+NOTE: Invalid third argument to function SUBSTR at line 279 column 26.
+EMPLID=  Name=  Job Title=  Division/Field Office=  Postal=  Location=  name2=  _ERROR_=1 _N_=924
+NOTE: Invalid third argument to function SUBSTR at line 279 column 26.
+EMPLID=  Name=  Job Title=  Division/Field Office=  Postal=  Location=  name2=  _ERROR_=1 _N_=925
+NOTE: Invalid third argument to function SUBSTR at line 279 column 26.
+EMPLID=  Name=  Job Title=  Division/Field Office=  Postal=  Location=  name2=  _ERROR_=1 _N_=926
+NOTE: Invalid third argument to function SUBSTR at line 279 column 26.
+EMPLID=  Name=  Job Title=  Division/Field Office=  Postal=  Location=  name2=  _ERROR_=1 _N_=927
+NOTE: Invalid third argument to function SUBSTR at line 279 column 26.
+EMPLID=  Name=  Job Title=  Division/Field Office=  Postal=  Location=  name2=  _ERROR_=1 _N_=928
+NOTE: Invalid third argument to function SUBSTR at line 279 column 26.
+EMPLID=  Name=  Job Title=  Division/Field Office=  Postal=  Location=  name2=  _ERROR_=1 _N_=929
+NOTE: Invalid third argument to function SUBSTR at line 279 column 26.
+EMPLID=  Name=  Job Title=  Division/Field Office=  Postal=  Location=  name2=  _ERROR_=1 _N_=930
+NOTE: Invalid third argument to function SUBSTR at line 279 column 26.
+EMPLID=  Name=  Job Title=  Division/Field Office=  Postal=  Location=  name2=  _ERROR_=1 _N_=931
+NOTE: Invalid third argument to function SUBSTR at line 279 column 26.
+WARNING: Limit set by ERRORS= option reached.  Further errors of this type will not be printed.
+EMPLID=  Name=  Job Title=  Division/Field Office=  Postal=  Location=  name2=  _ERROR_=1 _N_=932
+NOTE: There were 1013 observations read from the data set WORK.ADDRS.
+NOTE: The data set WORK.ADDRS has 1013 observations and 2 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      user cpu time       0.00 seconds
+      system cpu time     0.00 seconds
+      memory              1328.62k
+      OS Memory           20388.00k
+      Timestamp           10/30/2026 09:40:28 AM
+      Step Count                        19  Switch Count  1
+      Page Faults                       9
+      Page Reclaims                     220
+      Page Swaps                        0
+      Voluntary Context Switches        10
+      Involuntary Context Switches      0
+      Block Input Operations            80
+      Block Output Operations           544
+      
+
+286        
+287        		
+287      !   proc sort data= addrs; by name2; run;
+
+NOTE: There were 1013 observations read from the data set WORK.ADDRS.
+NOTE: The data set WORK.ADDRS has 1013 observations and 2 variables.
+NOTE: PROCEDURE SORT used (Total process time):
+      real time           0.00 seconds
+      user cpu time       0.00 seconds
+      system cpu time     0.00 seconds
+      memory              1436.53k
+      OS Memory           20648.00k
+      Timestamp           10/30/2026 09:40:28 AM
+      Step Count                        20  Switch Count  1
+      Page Faults                       23
+      Page Reclaims                     236
+      Page Swaps                        0
+      Voluntary Context Switches        6
+      Involuntary Context Switches      0
+      Block Input Operations            0
+      Block Output Operations           528
+      
+
+288        		
+289        			/* update static file */
+290        			
+290      !    data src.zips (keep=postal name2);
+291        				update src.zips addrs;
+292        				by name2;
+293        			run;
+
+NOTE: There were 1655 observations read from the data set SRC.ZIPS.
+NOTE: There were 1013 observations read from the data set WORK.ADDRS.
+NOTE: The data set SRC.ZIPS has 1655 observations and 2 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.01 seconds
+      user cpu time       0.00 seconds
+      system cpu time     0.00 seconds
+      memory              1995.00k
+      OS Memory           20904.00k
+      Timestamp           10/30/2026 09:40:28 AM
+      Step Count                        21  Switch Count  1
+      Page Faults                       9
+      Page Reclaims                     281
+      Page Swaps                        0
+      Voluntary Context Switches        40
+      Involuntary Context Switches      0
+      Block Input Operations            544
+      Block Output Operations           520
+      
+
+294        
+295        
+296        
+297        	
+298        
+299        
+300        
+301        
+302        
+303        
+304        ;*';*";*/;quit;run;
+305                        ods html5 (id=saspy_internal) close;
+306                        ods listing;
+307        

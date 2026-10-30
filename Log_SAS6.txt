@@ -1,0 +1,2334 @@
+30                                                         The SAS System                             07:47 Friday, October 30, 2026
+
+1751       
+1752                       ods listing close;
+1753                       ods html5 (id=saspy_internal) options(bitmap_mode='inline')
+1754                           file="/saswork/SAS_workD9AD0015E302_prdsasgridn12/SAS_work54B60015E302_prdsasgridn12/saspy_results.ht
+1754     ! ml"
+1755                           device=svg
+1756                           style=HTMLBlue;
+NOTE: Writing HTML5(SASPY_INTERNAL) Body file: 
+      /saswork/SAS_workD9AD0015E302_prdsasgridn12/SAS_work54B60015E302_prdsasgridn12/saspy_results.html
+1757                       ods graphics on / outputfmt=png;
+1758                   ;*';*";*/;quit;run;/* Material Damage SAS Script 6 : Import and Prep Python Output v2 Superfile Fixes*/
+1759       
+1760       %macro custom_infile();
+1761       	%if &flag. = 1 %then
+1762       		%do;
+1763       
+1764       			data WORK.PYTHONRAW;
+1765       				infile "/ere/local/shared/actuarial/Share/Claims/WPC/Material Damage/executable/Output/model_out.csv" delimiter =
+1766       					',' MISSOVER DSD lrecl=32767 firstobs=2;
+1767       				informat VAR1 best32.;
+1768       				informat drpno $8.;
+1769       				informat pred best32.;
+1770       				informat USR_RPT_BRNCH_DC best32.;
+1771       				informat veh_age best32.;
+1772       				informat lien_lease best32.;
+1773       				informat veh_opr best32.;
+1774       				informat common_veh best32.;
+1775       				informat VEH_STYL_DC_grp best32.;
+1776       				informat vehicles_in_20mi best32.;
+1777       				informat br_pos_emp_count best32.;
+1778       				informat drivetime best32.;
+1779       				informat coll_pnt_grp best32.;
+1780       				informat DRVR_INSD_REL_TYP_DC best32.;
+1781       				informat LOB_grp best32.;
+1782       				informat SEL_APPR_TYP_DC best32.;
+1783       				informat monthc best32.;
+1784       				informat DirectRepairProgram best32.;
+1785       				informat MaterialDamageAdjuster best32.;
+1786       				informat IndependentAdjuster best32.;
+1787       				informat EstimateDeskReview best32.;
+1788       				informat PhotoAppraisal best32.;
+1789       				informat supplements best32.;
+1790       				informat has_rental best32.;
+1791       				informat baseline_mean best32.;
+1792       				format VAR1 best12.;
+1793       				format drpno $8.;
+1794       				format pred best12.;
+1795       				format USR_RPT_BRNCH_DC best12.;
+1796       				format veh_age best12.;
+1797       				format lien_lease best12.;
+1798       				format veh_opr best12.;
+1799       				format common_veh best12.;
+1800       				format VEH_STYL_DC_grp best12.;
+1801       				format vehicles_in_20mi best12.;
+1802       				format br_pos_emp_count best12.;
+1803       				format drivetime best12.;
+1804       				format coll_pnt_grp best12.;
+1805       				format DRVR_INSD_REL_TYP_DC best12.;
+1806       				format LOB_grp best12.;
+1807       				format SEL_APPR_TYP_DC best12.;
+1808       				format monthc best12.;
+1809       				format DirectRepairProgram best12.;
+1810       				format MaterialDamageAdjuster best12.;
+1811       				format IndependentAdjuster best12.;
+1812       				format EstimateDeskReview best12.;
+1813       				format PhotoAppraisal best12.;
+1814       				format supplements best32.;
+1815       				format has_rental best32.;
+1816       				format baseline_mean best12.;
+1817       				input
+1818       					VAR1
+1819       					drpno
+1820       					pred
+1821       					USR_RPT_BRNCH_DC
+1822       					veh_age
+1823       					lien_lease
+1824       					veh_opr
+1825       					common_veh
+1826       					VEH_STYL_DC_grp
+1827       					vehicles_in_20mi
+1828       					br_pos_emp_count
+1829       					drivetime
+1830       					coll_pnt_grp
+1831       					DRVR_INSD_REL_TYP_DC
+1832       					LOB_grp
+1833       					SEL_APPR_TYP_DC
+1834       					monthc
+1835       					DirectRepairProgram
+1836       					MaterialDamageAdjuster
+1837       					IndependentAdjuster
+1838       					EstimateDeskReview
+1839       					PhotoAppraisal
+1840       					supplements
+1841       					has_rental
+1842       					baseline_mean
+1843       				;
+1844       			run;
+1845       
+1846       		%end;
+1847       	%else
+1848       		%do;
+1849       
+1850       			data WORK.PYTHONRAW;
+1851       				infile "&output_path_csv/model_out.csv" delimiter =
+1852       					',' MISSOVER DSD lrecl=32767 firstobs=2;
+1853       				informat VAR1 best32.;
+1854       				informat drpno $8.;
+1855       				informat pred best32.;
+1856       				informat USR_RPT_BRNCH_DC best32.;
+1857       				informat veh_age best32.;
+1858       				informat lien_lease best32.;
+1859       				informat veh_opr best32.;
+1860       				informat common_veh best32.;
+1861       				informat VEH_STYL_DC_grp best32.;
+1862       				informat vehicles_in_20mi best32.;
+1863       				informat br_pos_emp_count best32.;
+1864       				informat drivetime best32.;
+1865       				informat coll_pnt_grp best32.;
+1866       				informat DRVR_INSD_REL_TYP_DC best32.;
+1867       				informat LOB_grp best32.;
+1868       				informat SEL_APPR_TYP_DC best32.;
+1869       				informat monthc best32.;
+1870       				informat DirectRepairProgram best32.;
+1871       				informat MaterialDamageAdjuster best32.;
+1872       				informat IndependentAdjuster best32.;
+1873       				informat EstimateDeskReview best32.;
+1874       				informat PhotoAppraisal best32.;
+1875       				informat supplements best32.;
+1876       				informat has_rental best32.;
+1877       				informat baseline_mean best32.;
+1878       				format VAR1 best12.;
+1879       				format drpno $8.;
+1880       				format pred best12.;
+1881       				format USR_RPT_BRNCH_DC best12.;
+1882       				format veh_age best12.;
+1883       				format lien_lease best12.;
+1884       				format veh_opr best12.;
+1885       				format common_veh best12.;
+1886       				format VEH_STYL_DC_grp best12.;
+1887       				format vehicles_in_20mi best12.;
+1888       				format br_pos_emp_count best12.;
+1889       				format drivetime best12.;
+1890       				format coll_pnt_grp best12.;
+1891       				format DRVR_INSD_REL_TYP_DC best12.;
+1892       				format LOB_grp best12.;
+1893       				format SEL_APPR_TYP_DC best12.;
+1894       				format monthc best12.;
+1895       				format DirectRepairProgram best12.;
+1896       				format MaterialDamageAdjuster best12.;
+1897       				format IndependentAdjuster best12.;
+1898       				format EstimateDeskReview best12.;
+1899       				format PhotoAppraisal best12.;
+1900       				format supplements best32.;
+1901       				format has_rental best32.;
+1902       				format baseline_mean best12.;
+1903       				input
+1904       					VAR1
+1905       					drpno
+1906       					pred
+1907       					USR_RPT_BRNCH_DC
+1908       					veh_age
+1909       					lien_lease
+1910       					veh_opr
+1911       					common_veh
+1912       					VEH_STYL_DC_grp
+1913       					vehicles_in_20mi
+1914       					br_pos_emp_count
+1915       					drivetime
+1916       					coll_pnt_grp
+1917       					DRVR_INSD_REL_TYP_DC
+1918       					LOB_grp
+1919       					SEL_APPR_TYP_DC
+1920       					monthc
+1921       					DirectRepairProgram
+1922       					MaterialDamageAdjuster
+1923       					IndependentAdjuster
+1924       					EstimateDeskReview
+1925       					PhotoAppraisal
+1926       					supplements
+1927       					has_rental
+1928       					baseline_mean
+1929       				;
+1930       			run;
+1931       
+1932       		%end;
+1933       %mend custom_infile;
+1934       
+1935       %custom_infile();
+
+NOTE: The infile "/ere/local/shared/actuarial/Share/Claims/WPC/TESTING 2/Material Damage V2/2026/10-28-2026/model_out.csv" is:
+      Filename=/ere/local/shared/actuarial/Share/Claims/WPC/TESTING 2/Material Damage V2/2026/10-28-2026/model_out.csv,
+      Owner Name=xh787,Group Name=ereapp,
+      Access Permission=-rwx------,
+      Last Modified=30Oct2026:09:26:25,
+      File Size (bytes)=840603617
+
+NOTE: 1744616 records were read from the infile "/ere/local/shared/actuarial/Share/Claims/WPC/TESTING 2/Material Damage 
+      V2/2026/10-28-2026/model_out.csv".
+      The minimum record length was 444.
+      The maximum record length was 499.
+NOTE: The data set WORK.PYTHONRAW has 1744616 observations and 25 variables.
+NOTE: DATA statement used (Total process time):
+      real time           3.12 seconds
+      user cpu time       2.50 seconds
+      system cpu time     0.35 seconds
+      memory              922.56k
+      OS Memory           36008.00k
+      Timestamp           10/30/2026 09:26:47 AM
+      Step Count                        670  Switch Count  1
+      Page Faults                       21
+      Page Reclaims                     105
+      Page Swaps                        0
+      Voluntary Context Switches        1540
+      Involuntary Context Switches      9
+      Block Input Operations            1658512
+      Block Output Operations           682520
+      
+
+1936       
+1937       data python2;
+1938       	set pythonraw (drop=var1);
+1939       	nuisance = sum(USR_RPT_BRNCH_DC);
+1940       	type = SEL_APPR_TYP_DC;
+1941       
+1942       	vehicle = sum(veh_age,lien_lease,
+1943       		veh_opr,
+1944       		common_veh,
+1945       		VEH_STYL_DC_grp
+1946       		);
+1947       
+1948       	service_area = sum(vehicles_in_20mi,
+1949       		br_pos_emp_count,
+1950       		drivetime);
+1951       
+1952       	incident = sum(coll_pnt_grp,
+1953       		DRVR_INSD_REL_TYP_DC,
+1954       		LOB_grp);
+1955       
+1956       	appraisal = sum(monthc,
+1957       		DirectRepairProgram,
+1958       		MaterialDamageAdjuster,
+1959       		IndependentAdjuster,
+1960       		EstimateDeskReview,
+1961       		PhotoAppraisal,
+1962       		supplements,
+1963       		has_rental);
+1964       
+1965       	shap_pred = sum(baseline_mean
+1966       		,nuisance
+1967       		,type
+1968       		,vehicle
+1969       		,service_area
+1970       		,incident
+1971       		,appraisal);
+1972       	check = round(shap_pred - pred,.001);
+1973       run;
+
+NOTE: There were 1744616 observations read from the data set WORK.PYTHONRAW.
+NOTE: The data set WORK.PYTHON2 has 1744616 observations and 32 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.39 seconds
+      user cpu time       0.12 seconds
+      system cpu time     0.25 seconds
+      memory              1416.93k
+      OS Memory           36524.00k
+      Timestamp           10/30/2026 09:26:48 AM
+      Step Count                        671  Switch Count  1
+      Page Faults                       16
+      Page Reclaims                     225
+      Page Swaps                        0
+      Voluntary Context Switches        30
+      Involuntary Context Switches      7
+      Block Input Operations            88
+      Block Output Operations           873496
+      
+
+1974       
+1975       PROC SQL;
+1976       	CREATE TABLE for_report As
+1977       		Select a.svc_req_nr
+1978       			,A.SEL_APPR_TYP_DC
+1979       			,A.ADJ_NM	
+1980       			,A.USR_RPT_BRNCH_DC	
+1981       			,A.ADJ_POS_DC	
+1982       			/*,A.ADJ_GRP_DC	*/
+1983               	/*,A.year	*/
+1984               	/*,A.month	*/
+1985       	        /*, a.elaps2*/
+1986       
+1987       	, datepart(a.EVNT_DT) as complete_dt format mmddyy10.
+1988       	, max(B.pred,0) as model_elaps
+1989       	,b.vehicle
+1990       	,b.service_area
+1991       	,b.incident
+1992       	,b.appraisal
+1993       	From mdl_curr.for_pythonscoring as A left join python2 as B
+1994       		/*			on a.clm_nr = b.clm_nr*/
+1995       	on compress(a.svc_req_nr) = compress(b.drpno)
+1996       	/* may need supervisor name too */
+1997       	;
+NOTE: Table WORK.FOR_REPORT created, with 1744616 rows and 11 columns.
+
+1998       QUIT;
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           6.49 seconds
+      user cpu time       2.81 seconds
+      system cpu time     3.72 seconds
+      memory              1049584.62k
+      OS Memory           1082628.00k
+      Timestamp           10/30/2026 09:26:54 AM
+      Step Count                        672  Switch Count  2
+      Page Faults                       421
+      Page Reclaims                     360898
+      Page Swaps                        0
+      Voluntary Context Switches        50476
+      Involuntary Context Switches      251
+      Block Input Operations            2490104
+      Block Output Operations           7421240
+      
+
+1999       
+2000       /* append pay periods */
+2001       PROC SQL;
+2002       	CREATE TABLE for_report As
+2003       		Select A.*
+2004       			, B.payperiod
+2005       		From for_report as A left join src.payperiods as B
+2006       			on A.complete_dt >= B.paystart
+2007       			and A.complete_dt <= B.payend
+2008       	;
+NOTE: The execution of this query involves performing one or more Cartesian product joins that can not be optimized.
+WARNING: This CREATE TABLE statement recursively references the target table. A consequence of this is a possible data integrity 
+         problem.
+NOTE: Table WORK.FOR_REPORT created, with 1744616 rows and 12 columns.
+
+2009       QUIT;
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           12.64 seconds
+      user cpu time       11.85 seconds
+      system cpu time     0.61 seconds
+      memory              6272.93k
+      OS Memory           41648.00k
+      Timestamp           10/30/2026 09:27:07 AM
+      Step Count                        673  Switch Count  2
+      Page Faults                       1
+      Page Reclaims                     296
+      Page Swaps                        0
+      Voluntary Context Switches        88
+      Involuntary Context Switches      31
+      Block Input Operations            552
+      Block Output Operations           1937944
+      
+
+2010       
+2011       /* apply some filters  */
+2012       data for_report;
+2013       	set for_report;
+2014       	where not missing(usr_rpt_brnch_dc);
+2015       
+2016       	/* count data does not split IA1 and IA2, so for summary */
+2017       	if ADJ_POS_DC in ('Material Damage Inside Adjuster I','Material Damage Inside Adjuster II') then
+2018       		ADJ_POS_DC = 'Inside Adjuster';
+2019       run;
+
+NOTE: There were 1744616 observations read from the data set WORK.FOR_REPORT.
+      WHERE not MISSING(usr_rpt_brnch_dc);
+NOTE: The data set WORK.FOR_REPORT has 1744616 observations and 12 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.85 seconds
+      user cpu time       0.22 seconds
+      system cpu time     0.62 seconds
+      memory              1342.78k
+      OS Memory           36524.00k
+      Timestamp           10/30/2026 09:27:08 AM
+      Step Count                        674  Switch Count  1
+      Page Faults                       10
+      Page Reclaims                     223
+      Page Swaps                        0
+      Voluntary Context Switches        54
+      Involuntary Context Switches      0
+      Block Input Operations            0
+      Block Output Operations           1937936
+      
+
+2020       
+2021       /* decode name to adjuster number from hc data */
+2022       /*merge decode on to data */
+2023       PROC SQL;
+2024       	CREATE TABLE for_report As
+2025       		Select A.*
+2026       			, B.EMP_ID
+2027       		From for_report as A left join mdl_curr.adj_decode as B
+2028       			on compress(A.ADJ_NM) = compress(B.EMP_NM)
+2029       	;
+WARNING: This CREATE TABLE statement recursively references the target table. A consequence of this is a possible data integrity 
+         problem.
+NOTE: Table WORK.FOR_REPORT created, with 1744616 rows and 13 columns.
+
+2030       QUIT;
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           3.44 seconds
+      user cpu time       1.99 seconds
+      system cpu time     3.09 seconds
+      memory              1050757.78k
+      OS Memory           1083832.00k
+      Timestamp           10/30/2026 09:27:11 AM
+      Step Count                        675  Switch Count  2
+      Page Faults                       359
+      Page Reclaims                     316861
+      Page Swaps                        0
+      Voluntary Context Switches        31781
+      Involuntary Context Switches      423
+      Block Input Operations            848
+      Block Output Operations           6531120
+      
+
+2031       
+2032       /* take individual means early */
+2033       proc means data= for_report noprint nway missing;
+2034       	class SEL_APPR_TYP_DC EMP_ID ADJ_POS_DC USR_RPT_BRNCH_DC payperiod;
+2035       	var model_elaps vehicle service_area incident appraisal;
+2036       	output out= adj_mdl (drop = _type_ ) mean=;
+2037       	where not missing(EMP_ID);
+2038       run;
+
+NOTE: There were 1743601 observations read from the data set WORK.FOR_REPORT.
+      WHERE not MISSING(EMP_ID);
+NOTE: The data set WORK.ADJ_MDL has 90897 observations and 11 variables.
+NOTE: PROCEDURE MEANS used (Total process time):
+      real time           0.72 seconds
+      user cpu time       0.72 seconds
+      system cpu time     0.27 seconds
+      memory              27514.00k
+      OS Memory           61488.00k
+      Timestamp           10/30/2026 09:27:12 AM
+      Step Count                        676  Switch Count  1
+      Page Faults                       110
+      Page Reclaims                     6212
+      Page Swaps                        0
+      Voluntary Context Switches        6216
+      Involuntary Context Switches      43
+      Block Input Operations            256
+      Block Output Operations           38936
+      
+
+2039       
+2040       /* only keep ones with at least 5 of that service type for pay period  */
+2041       data adj_mdl;
+2042       	set adj_mdl;
+2043       	where _freq_ > 5;
+2044       run;
+
+NOTE: There were 54342 observations read from the data set WORK.ADJ_MDL.
+      WHERE _freq_>5;
+NOTE: The data set WORK.ADJ_MDL has 54342 observations and 11 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.02 seconds
+      user cpu time       0.00 seconds
+      system cpu time     0.01 seconds
+      memory              1329.28k
+      OS Memory           36524.00k
+      Timestamp           10/30/2026 09:27:12 AM
+      Step Count                        677  Switch Count  1
+      Page Faults                       8
+      Page Reclaims                     216
+      Page Swaps                        0
+      Voluntary Context Switches        9
+      Involuntary Context Switches      4
+      Block Input Operations            0
+      Block Output Operations           23056
+      
+
+2045       
+2046       /* replace this with a rolling 12 months */
+2047       /*JOIN ON DATA WHERE CALENDAR DATE IN RIGHT WINDOW - CAREFUL WITH HOW YOU PLAY WITH DAYS AND SIGNS*/
+2048       /*create  UNIQUE COMBOS*/
+2049       proc sql;
+2050       	create table
+2051       		YE
+2052       	as select distinct
+2053       		SEL_APPR_TYP_DC,
+2054       		payperiod
+2055       	from
+2056       		adj_mdl
+2057       	;
+NOTE: Table WORK.YE created, with 656 rows and 2 columns.
+
+2058       quit;
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.02 seconds
+      user cpu time       0.02 seconds
+      system cpu time     0.01 seconds
+      memory              11887.60k
+      OS Memory           45048.00k
+      Timestamp           10/30/2026 09:27:12 AM
+      Step Count                        678  Switch Count  1
+      Page Faults                       179
+      Page Reclaims                     2410
+      Page Swaps                        0
+      Voluntary Context Switches        31
+      Involuntary Context Switches      6
+      Block Input Operations            0
+      Block Output Operations           7728
+      
+
+2059       
+2060       proc sql;
+2061       	create table
+2062       		cwppd_roll
+2063       	as select distinct
+2064       		YE.SEL_APPR_TYP_DC,
+2065       		YE.payperiod,
+2066       		mean(model_elaps) as model_elaps_roll
+2067       	from YE left join adj_mdl b
+2068       		on YE.SEL_APPR_TYP_DC = b.SEL_APPR_TYP_DC
+2069       		AND b.payperiod > intnx('year',ye.payperiod,-1,'sameday')
+2070       		and  b.payperiod <= ye.payperiod
+2071       	group by
+2072       		YE.SEL_APPR_TYP_DC,
+2073       		YE.payperiod
+2074       	;
+NOTE: Table WORK.CWPPD_ROLL created, with 656 rows and 3 columns.
+
+2075       quit;
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.45 seconds
+      user cpu time       0.64 seconds
+      system cpu time     0.12 seconds
+      memory              198463.82k
+      OS Memory           230452.00k
+      Timestamp           10/30/2026 09:27:12 AM
+      Step Count                        679  Switch Count  1
+      Page Faults                       202
+      Page Reclaims                     50719
+      Page Swaps                        0
+      Voluntary Context Switches        5719
+      Involuntary Context Switches      88
+      Block Input Operations            672
+      Block Output Operations           12840
+      
+
+2076       
+2077       PROC SQL;
+2078       	CREATE TABLE ind_report As
+2079       		Select A.SEL_APPR_TYP_DC
+2080       			, a.EMP_ID
+2081       			, a.ADJ_POS_DC
+2082       			, a.USR_RPT_BRNCH_DC
+2083       			, a.payperiod
+2084       			, year(a.payperiod) as year
+2085       			, a.model_elaps as adj_avg
+2086       			, a._freq_ as records
+2087       			, a.vehicle ,a.service_area ,a.incident ,a.appraisal
+2088       			, b.model_elaps_roll
+2089       			, a.model_elaps/b.model_elaps_roll as adj_to_cw
+2090       		From adj_mdl as A left join cwppd_roll as B
+2091       			on A.SEL_APPR_TYP_DC = B.SEL_APPR_TYP_DC
+2092       			and A.payperiod = B.payperiod
+2093       	;
+NOTE: Table WORK.IND_REPORT created, with 54342 rows and 14 columns.
+
+2094       QUIT;
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.05 seconds
+      user cpu time       0.03 seconds
+      system cpu time     0.03 seconds
+      memory              21395.00k
+      OS Memory           54148.00k
+      Timestamp           10/30/2026 09:27:12 AM
+      Step Count                        680  Switch Count  1
+      Page Faults                       181
+      Page Reclaims                     4056
+      Page Swaps                        0
+      Voluntary Context Switches        464
+      Involuntary Context Switches      23
+      Block Input Operations            40
+      Block Output Operations           49704
+      
+
+2095       
+2096       /* force adjustments to be normal */
+2097       proc sort data=ind_report;
+2098       	by sel_appr_typ_dc year;
+2099       run;
+
+NOTE: There were 54342 observations read from the data set WORK.IND_REPORT.
+NOTE: The data set WORK.IND_REPORT has 54342 observations and 14 variables.
+NOTE: PROCEDURE SORT used (Total process time):
+      real time           0.03 seconds
+      user cpu time       0.01 seconds
+      system cpu time     0.02 seconds
+      memory              19833.50k
+      OS Memory           54808.00k
+      Timestamp           10/30/2026 09:27:12 AM
+      Step Count                        681  Switch Count  1
+      Page Faults                       6
+      Page Reclaims                     4462
+      Page Swaps                        0
+      Voluntary Context Switches        13
+      Involuntary Context Switches      1
+      Block Input Operations            160
+      Block Output Operations           25616
+      
+
+2100       
+2101       proc rank data=ind_report out=ind_report groups=100;
+2102       	var adj_to_cw;
+2103       	by sel_appr_typ_dc year;
+2104       	ranks adj_to_cw_n;
+2105       run;
+
+NOTE: There were 54342 observations read from the data set WORK.IND_REPORT.
+NOTE: The data set WORK.IND_REPORT has 54342 observations and 15 variables.
+NOTE: PROCEDURE RANK used (Total process time):
+      real time           0.04 seconds
+      user cpu time       0.01 seconds
+      system cpu time     0.01 seconds
+      memory              3553.40k
+      OS Memory           38320.00k
+      Timestamp           10/30/2026 09:27:12 AM
+      Step Count                        682  Switch Count  2
+      Page Faults                       3
+      Page Reclaims                     365
+      Page Swaps                        0
+      Voluntary Context Switches        36
+      Involuntary Context Switches      0
+      Block Input Operations            272
+      Block Output Operations           27168
+      
+
+2106       
+2107       data ind_report;
+2108       	set ind_report;
+2109       	z_score = max(min((adj_to_cw_n)/100,99),.01); /* 0 and 1 cannot be quantiles */
+2110       	norm = quantile('NORMAL',z_score);
+2111       	norm_adj = round(1+norm*.05,.01);
+2112       run;
+
+NOTE: There were 54342 observations read from the data set WORK.IND_REPORT.
+NOTE: The data set WORK.IND_REPORT has 54342 observations and 18 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.04 seconds
+      user cpu time       0.00 seconds
+      system cpu time     0.01 seconds
+      memory              1333.00k
+      OS Memory           36268.00k
+      Timestamp           10/30/2026 09:27:13 AM
+      Step Count                        683  Switch Count  1
+      Page Faults                       11
+      Page Reclaims                     249
+      Page Swaps                        0
+      Voluntary Context Switches        48
+      Involuntary Context Switches      0
+      Block Input Operations            328
+      Block Output Operations           29208
+      
+
+2113       
+2114       /* rank the four flags */
+2115       proc rank data=ind_report out=ind_report groups=4;
+2116       	var vehicle;
+2117       	by sel_appr_typ_dc year;
+2118       	ranks vehicle_r;
+2119       run;
+
+NOTE: There were 54342 observations read from the data set WORK.IND_REPORT.
+NOTE: The data set WORK.IND_REPORT has 54342 observations and 19 variables.
+NOTE: PROCEDURE RANK used (Total process time):
+      real time           0.02 seconds
+      user cpu time       0.01 seconds
+      system cpu time     0.02 seconds
+      memory              3565.96k
+      OS Memory           38320.00k
+      Timestamp           10/30/2026 09:27:13 AM
+      Step Count                        684  Switch Count  2
+      Page Faults                       0
+      Page Reclaims                     346
+      Page Swaps                        0
+      Voluntary Context Switches        13
+      Involuntary Context Switches      0
+      Block Input Operations            0
+      Block Output Operations           30760
+      
+
+2120       
+2121       proc rank data=ind_report out=ind_report groups=4;
+2122       	var service_area;
+2123       	by sel_appr_typ_dc year;
+2124       	ranks service_area_r;
+2125       run;
+
+NOTE: There were 54342 observations read from the data set WORK.IND_REPORT.
+NOTE: The data set WORK.IND_REPORT has 54342 observations and 20 variables.
+NOTE: PROCEDURE RANK used (Total process time):
+      real time           0.02 seconds
+      user cpu time       0.02 seconds
+      system cpu time     0.01 seconds
+      memory              3566.21k
+      OS Memory           38320.00k
+      Timestamp           10/30/2026 09:27:13 AM
+      Step Count                        685  Switch Count  2
+      Page Faults                       0
+      Page Reclaims                     346
+      Page Swaps                        0
+      Voluntary Context Switches        12
+      Involuntary Context Switches      1
+      Block Input Operations            0
+      Block Output Operations           31264
+      
+
+2126       
+2127       proc rank data=ind_report out=ind_report groups=4;
+2128       	var incident;
+2129       	by sel_appr_typ_dc year;
+2130       	ranks incident_r;
+2131       run;
+
+NOTE: There were 54342 observations read from the data set WORK.IND_REPORT.
+NOTE: The data set WORK.IND_REPORT has 54342 observations and 21 variables.
+NOTE: PROCEDURE RANK used (Total process time):
+      real time           0.02 seconds
+      user cpu time       0.01 seconds
+      system cpu time     0.02 seconds
+      memory              3569.09k
+      OS Memory           38320.00k
+      Timestamp           10/30/2026 09:27:13 AM
+      Step Count                        686  Switch Count  2
+      Page Faults                       0
+      Page Reclaims                     346
+      Page Swaps                        0
+      Voluntary Context Switches        12
+      Involuntary Context Switches      1
+      Block Input Operations            0
+      Block Output Operations           32288
+      
+
+2132       
+2133       proc rank data=ind_report out=ind_report groups=4;
+2134       	var appraisal;
+2135       	by sel_appr_typ_dc year;
+2136       	ranks appraisal_r;
+2137       run;
+
+NOTE: There were 54342 observations read from the data set WORK.IND_REPORT.
+NOTE: The data set WORK.IND_REPORT has 54342 observations and 22 variables.
+NOTE: PROCEDURE RANK used (Total process time):
+      real time           0.02 seconds
+      user cpu time       0.01 seconds
+      system cpu time     0.01 seconds
+      memory              3568.65k
+      OS Memory           38320.00k
+      Timestamp           10/30/2026 09:27:13 AM
+      Step Count                        687  Switch Count  2
+      Page Faults                       0
+      Page Reclaims                     347
+      Page Swaps                        0
+      Voluntary Context Switches        11
+      Involuntary Context Switches      0
+      Block Input Operations            0
+      Block Output Operations           33312
+      
+
+2138       
+2139       data ind_report;
+2140       	set ind_report;
+2141       	length region $10.;
+2142       
+2143       	if USR_RPT_BRNCH_DC = 'Columbus' then
+2144       		region = 'West';
+2145       	else if USR_RPT_BRNCH_DC = 'Roanoke' then
+2146       		region = 'Southeast';
+2147       	else if USR_RPT_BRNCH_DC = 'Charlotte' then
+2148       		region = 'Southeast';
+2149       	else if USR_RPT_BRNCH_DC = 'Silver Spring' then
+2150       		region = 'Southeast';
+2151       	else if USR_RPT_BRNCH_DC = 'Hagerstown' then
+2152       		region = 'Southeast';
+2153       	else if USR_RPT_BRNCH_DC = 'Tennessee' then
+2154       		region = 'West';
+2155       	else if USR_RPT_BRNCH_DC = 'Philadelphia' then
+2156       		region = 'Northeast';
+2157       	else if USR_RPT_BRNCH_DC = 'Murrysville' then
+2158       		region = 'Northeast';
+2159       	else if USR_RPT_BRNCH_DC = 'Harrisburg' then
+2160       		region = 'Northeast';
+2161       	else if USR_RPT_BRNCH_DC = 'Wisconsin' then
+2162       		region = 'West';
+2163       	else if USR_RPT_BRNCH_DC = 'Erie' then
+2164       		region = 'Northeast';
+2165       	else if USR_RPT_BRNCH_DC = 'Allentown' then
+2166       		region = 'Northeast';
+2167       	else if USR_RPT_BRNCH_DC = 'Indiana' then
+2168       		region = 'West';
+2169       	else if USR_RPT_BRNCH_DC = 'New York' then
+2170       		region = 'Northeast';
+2171       	else if USR_RPT_BRNCH_DC = 'West Virginia' then
+2172       		region = 'Southeast';
+2173       	else if USR_RPT_BRNCH_DC = 'Richmond' then
+2174       		region = 'Southeast';
+2175       	else if USR_RPT_BRNCH_DC = 'Pittsburgh' then
+2176       		region = 'Northeast';
+2177       	else if USR_RPT_BRNCH_DC = 'Raleigh' then
+2178       		region = 'Southeast';
+2179       	else if USR_RPT_BRNCH_DC = 'Fort Wayne' then
+2180       		region = 'West';
+2181       	else if USR_RPT_BRNCH_DC = 'Illinois' then
+2182       		region = 'West';
+2183       	else if USR_RPT_BRNCH_DC = 'Canton' then
+2184       		region = 'West';
+2185       	else if USR_RPT_BRNCH_DC = 'Kentucky' then
+2186       		region = 'West';
+2187       	else if USR_RPT_BRNCH_DC = 'Waynesboro' then
+2188       		region = 'Southeast';
+2189       	else if USR_RPT_BRNCH_DC = 'Claims' then
+2190       		region = 'Claims';
+2191       run;
+
+NOTE: There were 54342 observations read from the data set WORK.IND_REPORT.
+NOTE: The data set WORK.IND_REPORT has 54342 observations and 23 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.01 seconds
+      user cpu time       0.01 seconds
+      system cpu time     0.01 seconds
+      memory              1395.53k
+      OS Memory           36268.00k
+      Timestamp           10/30/2026 09:27:13 AM
+      Step Count                        688  Switch Count  1
+      Page Faults                       6
+      Page Reclaims                     218
+      Page Swaps                        0
+      Voluntary Context Switches        7
+      Involuntary Context Switches      2
+      Block Input Operations            0
+      Block Output Operations           33304
+      
+
+2192       
+2193       /* export - no longer transpose since need to keep details */
+2194       data ind_out;
+2195       	set ind_report;
+2196       	keep EMP_ID	
+2197       		USR_RPT_BRNCH_DC
+2198       		sel_appr_typ_dc	
+2199       		payperiod	
+2200       		ADJ_POS_DC
+2201       		norm_adj
+2202       		vehicle_r
+2203       		service_area_r
+2204       		incident_r
+2205       		appraisal_r;
+2206       run;
+
+NOTE: There were 54342 observations read from the data set WORK.IND_REPORT.
+NOTE: The data set WORK.IND_OUT has 54342 observations and 10 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.01 seconds
+      user cpu time       0.00 seconds
+      system cpu time     0.00 seconds
+      memory              1332.09k
+      OS Memory           36268.00k
+      Timestamp           10/30/2026 09:27:13 AM
+      Step Count                        689  Switch Count  1
+      Page Faults                       6
+      Page Reclaims                     216
+      Page Swaps                        0
+      Voluntary Context Switches        7
+      Involuntary Context Switches      0
+      Block Input Operations            0
+      Block Output Operations           22552
+      
+
+2207       
+2208       /* roll up to branch */
+2209       /* transpose, making all missings zeroes */
+2210       proc sort data=ind_report;
+2211       	by EMP_ID region USR_RPT_BRNCH_DC payperiod adj_pos_dc;
+2212       run;
+
+NOTE: There were 54342 observations read from the data set WORK.IND_REPORT.
+NOTE: The data set WORK.IND_REPORT has 54342 observations and 23 variables.
+NOTE: PROCEDURE SORT used (Total process time):
+      real time           0.04 seconds
+      user cpu time       0.03 seconds
+      system cpu time     0.03 seconds
+      memory              26842.25k
+      OS Memory           61580.00k
+      Timestamp           10/30/2026 09:27:13 AM
+      Step Count                        690  Switch Count  1
+      Page Faults                       1
+      Page Reclaims                     6231
+      Page Swaps                        0
+      Voluntary Context Switches        7
+      Involuntary Context Switches      2
+      Block Input Operations            64
+      Block Output Operations           33296
+      
+
+2213       
+2214       proc transpose data=ind_report out=ind_report2 prefix=adj;
+2215       	by EMP_ID region USR_RPT_BRNCH_DC payperiod adj_pos_dc;
+2216       	id SEL_APPR_TYP_DC;
+2217       	var norm_adj;
+2218       run;
+
+NOTE: There were 54342 observations read from the data set WORK.IND_REPORT.
+NOTE: The data set WORK.IND_REPORT2 has 50175 observations and 13 variables.
+NOTE: PROCEDURE TRANSPOSE used (Total process time):
+      real time           0.18 seconds
+      user cpu time       0.17 seconds
+      system cpu time     0.00 seconds
+      memory              3347.28k
+      OS Memory           38320.00k
+      Timestamp           10/30/2026 09:27:13 AM
+      Step Count                        691  Switch Count  2
+      Page Faults                       2
+      Page Reclaims                     349
+      Page Swaps                        0
+      Voluntary Context Switches        13
+      Involuntary Context Switches      1
+      Block Input Operations            64
+      Block Output Operations           19488
+      
+
+2219       
+2220       data ind_report2 (drop=i);
+2221       	set ind_report2;
+2222       	drop _NAME_;
+2223       	array N[*] adjDirectRepairProgram
+2224       		adjMaterialDamageAdjuster	
+2225       		adjEstimateDeskReview	
+2226       		adjSalvage	
+2227       		adjIndependentAdjuster	
+2228       		adjPhotoAppraisal
+2229       		adjOpenShop	
+2230       	;
+2231       
+2232       	do i=1 to hbound(N);
+2233       		if N[i]=. then
+2234       			N[i]=1;
+2235       	end;
+2236       run;
+
+NOTE: There were 50175 observations read from the data set WORK.IND_REPORT2.
+NOTE: The data set WORK.IND_REPORT2 has 50175 observations and 12 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.01 seconds
+      user cpu time       0.01 seconds
+      system cpu time     0.00 seconds
+      memory              1337.71k
+      OS Memory           36268.00k
+      Timestamp           10/30/2026 09:27:13 AM
+      Step Count                        692  Switch Count  1
+      Page Faults                       11
+      Page Reclaims                     216
+      Page Swaps                        0
+      Voluntary Context Switches        6
+      Involuntary Context Switches      0
+      Block Input Operations            0
+      Block Output Operations           18456
+      
+
+2237       
+2238       /* make matching position descriptions */
+2239       data ind_report2;
+2240       	set ind_report2;
+2241       
+2242       	if adj_pos_dc = 'Material Damage Adjuster' then
+2243       		adj_pos_dc = 'Field Adjuster';
+2244       run;
+
+NOTE: There were 50175 observations read from the data set WORK.IND_REPORT2.
+NOTE: The data set WORK.IND_REPORT2 has 50175 observations and 12 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.01 seconds
+      user cpu time       0.00 seconds
+      system cpu time     0.00 seconds
+      memory              1322.59k
+      OS Memory           36268.00k
+      Timestamp           10/30/2026 09:27:13 AM
+      Step Count                        693  Switch Count  1
+      Page Faults                       6
+      Page Reclaims                     216
+      Page Swaps                        0
+      Voluntary Context Switches        6
+      Involuntary Context Switches      0
+      Block Input Operations            0
+      Block Output Operations           18448
+      
+
+2245       
+2246       /* merge to hours / counts data */
+2247       PROC SQL;
+2248       	CREATE TABLE ind_report3 As
+2249       		Select A.*
+2250       			,b.Direct Repair Program
+                        ______
+                        79
+2251       			,b.MDA Services Complete as Material_Damage_Adjuster	
+                              ________
+                              22
+                              76
+ERROR 79-322: Expecting a FROM.
+
+ERROR 22-322: Syntax error, expecting one of the following: ',', JOIN.  
+
+ERROR 76-322: Syntax error, statement will be ignored.
+
+2252       			,b.Estimate Desk Review as Estimate_Desk_Review	
+2253       			,b.Salvage  	
+2254       			,b.Independent Adjuster as Independent_Adjuster	
+2255       			,b.Photo Appraisal as Photo_Appraisal
+2256       			,b.DimVal
+2257       	
+2258       
+2259       	, B.TotalRegHrsPaid as total_regular_hours_paid
+2260       	From ind_report2 as A left join mdl_curr.hcoutput as B
+2261       		on A.EMP_ID = B.EMP_ID
+2262       		/*and a.adj_pos_dc = b.'Adj Position'n*/
+2263               /*and A.USR_RPT_BRNCH_DC = B.'Adjuster Team Branch'n*/
+2264       	and A.payperiod = B.PayperiodEnd_dt
+2265       	;
+NOTE: PROC SQL set option NOEXEC and will continue to check the syntax of statements.
+2266       QUIT;
+NOTE: The SAS System stopped processing this step because of errors.
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.00 seconds
+      user cpu time       0.00 seconds
+      system cpu time     0.00 seconds
+      memory              165.43k
+      OS Memory           35236.00k
+      Timestamp           10/30/2026 09:27:13 AM
+      Step Count                        694  Switch Count  0
+      Page Faults                       6
+      Page Reclaims                     28
+      Page Swaps                        0
+      Voluntary Context Switches        0
+      Involuntary Context Switches      0
+      Block Input Operations            0
+      Block Output Operations           0
+      
+2267       
+2268       /* roll up to branch using hours as weight */
+
+
+2269       proc means data= ind_report3 noprint nway missing;
+ERROR: File WORK.IND_REPORT3.DATA does not exist.
+2270       	class USR_RPT_BRNCH_DC adj_pos_dc payperiod;
+ERROR: No data set open to look up variables.
+ERROR: No data set open to look up variables.
+ERROR: No data set open to look up variables.
+2271       	var adjDirectRepairProgram
+2272       		adjMaterialDamageAdjuster	
+ERROR: No data set open to look up variables.
+2273       		adjEstimateDeskReview	
+ERROR: No data set open to look up variables.
+2274       		adjSalvage	
+ERROR: No data set open to look up variables.
+2275       		adjIndependentAdjuster	
+ERROR: No data set open to look up variables.
+2276       		adjPhotoAppraisal
+ERROR: No data set open to look up variables.
+2277       		adjOpenShop;
+ERROR: No data set open to look up variables.
+ERROR: No data set open to look up variables.
+2278       	wgt total_regular_hours_paid;
+ERROR: No data set open to look up variables.
+2279       	output out= br_adjs (drop = _freq_ _type_) mean=;
+2280       	where adj_pos_dc ne 'Catastrophe Material Damage Adjuster';
+WARNING: No data sets qualify for WHERE processing.
+2281       run;
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BR_ADJS may be incomplete.  When this step was stopped there were 0 observations and 0 variables.
+NOTE: PROCEDURE MEANS used (Total process time):
+      real time           0.00 seconds
+      user cpu time       0.00 seconds
+      system cpu time     0.00 seconds
+      memory              223.68k
+      OS Memory           35236.00k
+      Timestamp           10/30/2026 09:27:13 AM
+      Step Count                        695  Switch Count  1
+      Page Faults                       2
+      Page Reclaims                     12
+      Page Swaps                        0
+      Voluntary Context Switches        9
+      Involuntary Context Switches      0
+      Block Input Operations            128
+      Block Output Operations           168
+      
+2282       
+2283       /* cat is blank since we have no hours to weight with */
+2284       /* roll up to region using hours as weight */
+
+
+2285       proc means data= ind_report3 noprint nway missing;
+ERROR: File WORK.IND_REPORT3.DATA does not exist.
+2286       	class region adj_pos_dc payperiod;
+ERROR: No data set open to look up variables.
+ERROR: No data set open to look up variables.
+ERROR: No data set open to look up variables.
+2287       	var adjDirectRepairProgram
+2288       		adjMaterialDamageAdjuster	
+ERROR: No data set open to look up variables.
+2289       		adjEstimateDeskReview	
+ERROR: No data set open to look up variables.
+2290       		adjSalvage	
+ERROR: No data set open to look up variables.
+2291       		adjIndependentAdjuster	
+ERROR: No data set open to look up variables.
+2292       		adjPhotoAppraisal
+ERROR: No data set open to look up variables.
+2293       		adjOpenShop;
+ERROR: No data set open to look up variables.
+ERROR: No data set open to look up variables.
+2294       	wgt total_regular_hours_paid;
+ERROR: No data set open to look up variables.
+2295       	output out= regn_adjs (drop = _freq_ _type_) mean=;
+2296       	where adj_pos_dc ne 'Catastrophe Material Damage Adjuster';
+WARNING: No data sets qualify for WHERE processing.
+2297       run;
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.REGN_ADJS may be incomplete.  When this step was stopped there were 0 observations and 0 variables.
+NOTE: PROCEDURE MEANS used (Total process time):
+      real time           0.00 seconds
+      user cpu time       0.00 seconds
+      system cpu time     0.00 seconds
+      memory              223.68k
+      OS Memory           35236.00k
+      Timestamp           10/30/2026 09:27:13 AM
+      Step Count                        696  Switch Count  1
+      Page Faults                       0
+      Page Reclaims                     11
+      Page Swaps                        0
+      Voluntary Context Switches        5
+      Involuntary Context Switches      0
+      Block Input Operations            0
+      Block Output Operations           176
+      
+2298       
+2299       /* create the mega-file for qlik */
+
+
+2300       data qlik;
+2301       	set ind_report;
+2302       	length qlikapptyp $3.;
+2303       
+2304       	if SEL_APPR_TYP_DC = 'DriveIn' then
+2305       		delete;
+2306       	else if SEL_APPR_TYP_DC= 'DirectRepairProgram' then
+2307       		qlikapptyp = 'DRP';
+2308       	else if SEL_APPR_TYP_DC= 'EstimateDeskReview' then
+2309       		qlikapptyp = 'EDR';
+2310       	else if SEL_APPR_TYP_DC= 'IndependentAdjuster' then
+2311       		qlikapptyp = 'IA';
+2312       	else if SEL_APPR_TYP_DC= 'MaterialDamageAdjuster' then
+2313       		qlikapptyp = 'MDA';
+2314       	else if SEL_APPR_TYP_DC= 'OpenShop' then
+2315       		qlikapptyp = 'OS';
+2316       	else if SEL_APPR_TYP_DC= 'PhotoAppraisal' then
+2317       		qlikapptyp = 'PA';
+2318       	else if SEL_APPR_TYP_DC= 'Salvage' then
+2319       		qlikapptyp = 'SAL';
+2320       run;
+
+NOTE: There were 54342 observations read from the data set WORK.IND_REPORT.
+NOTE: The data set WORK.QLIK has 54342 observations and 24 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.01 seconds
+      user cpu time       0.01 seconds
+      system cpu time     0.01 seconds
+      memory              1372.43k
+      OS Memory           36268.00k
+      Timestamp           10/30/2026 09:27:13 AM
+      Step Count                        697  Switch Count  1
+      Page Faults                       6
+      Page Reclaims                     218
+      Page Swaps                        0
+      Voluntary Context Switches        8
+      Involuntary Context Switches      1
+      Block Input Operations            0
+      Block Output Operations           33296
+      
+
+2321       
+2322       /* transpose individual table */
+2323       proc sort data= qlik;
+2324       	by EMP_ID payperiod region USR_RPT_BRNCH_DC adj_pos_dc;
+2325       run;
+
+NOTE: There were 54342 observations read from the data set WORK.QLIK.
+NOTE: The data set WORK.QLIK has 54342 observations and 24 variables.
+NOTE: PROCEDURE SORT used (Total process time):
+      real time           0.03 seconds
+      user cpu time       0.01 seconds
+      system cpu time     0.02 seconds
+      memory              26842.18k
+      OS Memory           61580.00k
+      Timestamp           10/30/2026 09:27:13 AM
+      Step Count                        698  Switch Count  1
+      Page Faults                       0
+      Page Reclaims                     6219
+      Page Swaps                        0
+      Voluntary Context Switches        6
+      Involuntary Context Switches      3
+      Block Input Operations            0
+      Block Output Operations           33296
+      
+
+2326       
+2327       /* 1- adjustment */
+2328       proc transpose data=qlik out=qlik1 prefix=final_adj_cap_;
+2329       	by EMP_ID payperiod region USR_RPT_BRNCH_DC adj_pos_dc;
+2330       	id qlikapptyp;
+2331       	var norm_adj;
+2332       run;
+
+NOTE: There were 54342 observations read from the data set WORK.QLIK.
+NOTE: The data set WORK.QLIK1 has 50175 observations and 13 variables.
+NOTE: PROCEDURE TRANSPOSE used (Total process time):
+      real time           0.18 seconds
+      user cpu time       0.17 seconds
+      system cpu time     0.01 seconds
+      memory              3348.78k
+      OS Memory           38320.00k
+      Timestamp           10/30/2026 09:27:13 AM
+      Step Count                        699  Switch Count  2
+      Page Faults                       0
+      Page Reclaims                     347
+      Page Swaps                        0
+      Voluntary Context Switches        11
+      Involuntary Context Switches      3
+      Block Input Operations            0
+      Block Output Operations           19496
+      
+
+2333       
+2334       /* 2- vehicle */
+2335       proc transpose data=qlik out=qlik2 prefix=vehicle_r_;
+2336       	by EMP_ID payperiod region USR_RPT_BRNCH_DC adj_pos_dc;
+2337       	id qlikapptyp;
+2338       	var vehicle_r;
+2339       run;
+
+NOTE: There were 54342 observations read from the data set WORK.QLIK.
+NOTE: The data set WORK.QLIK2 has 50175 observations and 14 variables.
+NOTE: PROCEDURE TRANSPOSE used (Total process time):
+      real time           0.20 seconds
+      user cpu time       0.18 seconds
+      system cpu time     0.01 seconds
+      memory              3343.34k
+      OS Memory           38320.00k
+      Timestamp           10/30/2026 09:27:13 AM
+      Step Count                        700  Switch Count  2
+      Page Faults                       0
+      Page Reclaims                     347
+      Page Swaps                        0
+      Voluntary Context Switches        11
+      Involuntary Context Switches      8
+      Block Input Operations            0
+      Block Output Operations           23584
+      
+
+2340       
+2341       /* 3- service area */
+2342       proc transpose data=qlik out=qlik3 prefix=service_area_r_;
+2343       	by EMP_ID payperiod region USR_RPT_BRNCH_DC adj_pos_dc;
+2344       	id qlikapptyp;
+2345       	var service_area_r;
+2346       run;
+
+NOTE: There were 54342 observations read from the data set WORK.QLIK.
+NOTE: The data set WORK.QLIK3 has 50175 observations and 14 variables.
+NOTE: PROCEDURE TRANSPOSE used (Total process time):
+      real time           0.18 seconds
+      user cpu time       0.18 seconds
+      system cpu time     0.01 seconds
+      memory              3345.75k
+      OS Memory           38064.00k
+      Timestamp           10/30/2026 09:27:14 AM
+      Step Count                        701  Switch Count  2
+      Page Faults                       0
+      Page Reclaims                     351
+      Page Swaps                        0
+      Voluntary Context Switches        12
+      Involuntary Context Switches      5
+      Block Input Operations            0
+      Block Output Operations           24608
+      
+
+2347       
+2348       /* 4- incident */
+2349       proc transpose data=qlik out=qlik4 prefix=incident_r_;
+2350       	by EMP_ID payperiod region USR_RPT_BRNCH_DC adj_pos_dc;
+2351       	id qlikapptyp;
+2352       	var incident_r;
+2353       run;
+
+NOTE: There were 54342 observations read from the data set WORK.QLIK.
+NOTE: The data set WORK.QLIK4 has 50175 observations and 14 variables.
+NOTE: PROCEDURE TRANSPOSE used (Total process time):
+      real time           0.20 seconds
+      user cpu time       0.18 seconds
+      system cpu time     0.02 seconds
+      memory              3343.37k
+      OS Memory           38064.00k
+      Timestamp           10/30/2026 09:27:14 AM
+      Step Count                        702  Switch Count  2
+      Page Faults                       0
+      Page Reclaims                     347
+      Page Swaps                        0
+      Voluntary Context Switches        11
+      Involuntary Context Switches      2
+      Block Input Operations            0
+      Block Output Operations           23584
+      
+
+2354       
+2355       /* 5- appraisal */
+2356       proc transpose data=qlik out=qlik5 prefix=appraisal_r_;
+2357       	by EMP_ID payperiod region USR_RPT_BRNCH_DC adj_pos_dc;
+2358       	id qlikapptyp;
+2359       	var appraisal_r;
+2360       run;
+
+NOTE: There were 54342 observations read from the data set WORK.QLIK.
+NOTE: The data set WORK.QLIK5 has 50175 observations and 14 variables.
+NOTE: PROCEDURE TRANSPOSE used (Total process time):
+      real time           0.20 seconds
+      user cpu time       0.18 seconds
+      system cpu time     0.01 seconds
+      memory              3345.71k
+      OS Memory           38064.00k
+      Timestamp           10/30/2026 09:27:14 AM
+      Step Count                        703  Switch Count  2
+      Page Faults                       0
+      Page Reclaims                     349
+      Page Swaps                        0
+      Voluntary Context Switches        12
+      Involuntary Context Switches      1
+      Block Input Operations            0
+      Block Output Operations           23584
+      
+
+2361       
+2362       PROC SQL;
+2363       	CREATE TABLE qlik_ind As
+2364       		Select 	a.EMP_ID
+2365       			,a.payperiod
+2366       			,a.USR_RPT_BRNCH_DC
+2367       			,a.adj_pos_dc
+2368       			,a.region
+2369       
+2370       			,a.final_adj_cap_DRP
+2371       			,a.final_adj_cap_EDR
+2372       			,a.final_adj_cap_IA
+2373       			,a.final_adj_cap_MDA
+2374       			,a.final_adj_cap_OS
+2375       			,a.final_adj_cap_PA
+2376       			,a.final_adj_cap_SAL
+2377       			, 1 as final_adj_cap_DV /* new */
+2378       
+2379       	,qlik2.vehicle_r_DRP
+2380       	,qlik2.vehicle_r_EDR
+2381       	,qlik2.vehicle_r_IA
+2382       	,qlik2.vehicle_r_MDA
+2383       	,qlik2.vehicle_r_OS
+2384       	,qlik2.vehicle_r_PA
+2385       	,qlik2.vehicle_r_SAL
+2386       	, . as vehicle_r_DV /*new */
+2387       
+2388       	,qlik3.service_area_r_DRP
+2389       	,qlik3.service_area_r_EDR
+2390       	,qlik3.service_area_r_IA
+2391       	,qlik3.service_area_r_MDA
+2392       	,qlik3.service_area_r_OS
+2393       	,qlik3.service_area_r_PA
+2394       	,qlik3.service_area_r_SAL
+2395       	, . as service_area_r_DV /*new */
+2396       
+2397       	,qlik4.incident_r_DRP
+2398       	,qlik4.incident_r_EDR
+2399       	,qlik4.incident_r_IA
+2400       	,qlik4.incident_r_MDA
+2401       	,qlik4.incident_r_OS
+2402       	,qlik4.incident_r_PA
+2403       	,qlik4.incident_r_SAL
+2404       	, . as incident_r_DV /*new */
+2405       
+2406       	,qlik5.appraisal_r_DRP
+2407       	,qlik5.appraisal_r_EDR
+2408       	,qlik5.appraisal_r_IA
+2409       	,qlik5.appraisal_r_MDA
+2410       	,qlik5.appraisal_r_OS
+2411       	,qlik5.appraisal_r_PA
+2412       	,qlik5.appraisal_r_SAL
+2413       	, . as appraisal_r_DV /*new */
+2414       	From qlik1 as A
+2415       
+2416       	left join qlik2
+2417       		on A.EMP_ID = qlik2.EMP_ID
+2418       		and A.payperiod = qlik2.payperiod
+2419       		and A.USR_RPT_BRNCH_DC = qlik2.USR_RPT_BRNCH_DC
+2420       		and A.adj_pos_dc = qlik2.adj_pos_dc
+2421       
+2422       	left join qlik3
+2423       		on A.EMP_ID = qlik3.EMP_ID
+2424       		and A.payperiod = qlik3.payperiod
+2425       		and A.USR_RPT_BRNCH_DC = qlik3.USR_RPT_BRNCH_DC
+2426       		and A.adj_pos_dc = qlik3.adj_pos_dc
+2427       
+2428       	left join qlik4
+2429       		on A.EMP_ID = qlik4.EMP_ID
+2430       		and A.payperiod = qlik4.payperiod
+2431       		and A.USR_RPT_BRNCH_DC = qlik4.USR_RPT_BRNCH_DC
+2432       		and A.adj_pos_dc = qlik4.adj_pos_dc
+2433       
+2434       	left join qlik5
+2435       		on A.EMP_ID = qlik5.EMP_ID
+2436       		and A.payperiod = qlik5.payperiod
+2437       		and A.USR_RPT_BRNCH_DC = qlik5.USR_RPT_BRNCH_DC
+2438       		and A.adj_pos_dc = qlik5.adj_pos_dc
+2439       	;
+NOTE: Table WORK.QLIK_IND created, with 50175 rows and 45 columns.
+
+2440       QUIT;
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.21 seconds
+      user cpu time       0.13 seconds
+      system cpu time     0.13 seconds
+      memory              24617.09k
+      OS Memory           56092.00k
+      Timestamp           10/30/2026 09:27:14 AM
+      Step Count                        704  Switch Count  1
+      Page Faults                       883
+      Page Reclaims                     18206
+      Page Swaps                        0
+      Voluntary Context Switches        1505
+      Involuntary Context Switches      20
+      Block Input Operations            344
+      Block Output Operations           131648
+      
+
+2441       
+2442       data qlik_ind;
+2443       	set qlik_ind;
+2444       
+2445       	if adj_pos_dc = 'Material Damage Adjuster' then
+2446       		adj_pos_dc = 'Field Adjuster';
+2447       run;
+
+NOTE: There were 50175 observations read from the data set WORK.QLIK_IND.
+NOTE: The data set WORK.QLIK_IND has 50175 observations and 45 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.02 seconds
+      user cpu time       0.00 seconds
+      system cpu time     0.02 seconds
+      memory              1416.40k
+      OS Memory           36012.00k
+      Timestamp           10/30/2026 09:27:14 AM
+      Step Count                        705  Switch Count  1
+      Page Faults                       7
+      Page Reclaims                     220
+      Page Swaps                        0
+      Voluntary Context Switches        10
+      Involuntary Context Switches      0
+      Block Input Operations            16
+      Block Output Operations           44056
+      
+
+2448       
+2449       /* merge branch stuff */
+2450       PROC SQL;
+2451       	CREATE TABLE qlik_all As
+2452       		Select A.*
+2453       			, B.adjDirectRepairProgram as DRP_adj_br
+2454       			, b.adjMaterialDamageAdjuster as MDA_adj_br
+2455       			, b.adjEstimateDeskReview as EDR_adj_br
+2456       			, b.adjSalvage as SAL_adj_br
+2457       			, b.adjIndependentAdjuster as IA_adj_br	
+2458       			, b.adjPhotoAppraisal as PA_adj_br
+2459       			, 1 as DV_adj_br /*new */
+2460       	From qlik_ind as A left join br_adjs as B
+2461       		on A.USR_RPT_BRNCH_DC = B.USR_RPT_BRNCH_DC
+2462       		and A.adj_pos_dc = B.adj_pos_dc
+2463       		and a.payperiod = b.payperiod
+2464       	;
+ERROR: Table WORK.BR_ADJS doesn't have any columns. PROC SQL requires each of its tables to have at least 1 column.
+ERROR: Column USR_RPT_BRNCH_DC could not be found in the table/view identified with the correlation name B.
+ERROR: Column USR_RPT_BRNCH_DC could not be found in the table/view identified with the correlation name B.
+ERROR: Column adj_pos_dc could not be found in the table/view identified with the correlation name B.
+ERROR: Column adj_pos_dc could not be found in the table/view identified with the correlation name B.
+ERROR: Column payperiod could not be found in the table/view identified with the correlation name B.
+ERROR: Column payperiod could not be found in the table/view identified with the correlation name B.
+ERROR: Column adjDirectRepairProgram could not be found in the table/view identified with the correlation name B.
+ERROR: Column adjMaterialDamageAdjuster could not be found in the table/view identified with the correlation name B.
+ERROR: Column adjEstimateDeskReview could not be found in the table/view identified with the correlation name B.
+ERROR: Column adjSalvage could not be found in the table/view identified with the correlation name B.
+ERROR: Column adjIndependentAdjuster could not be found in the table/view identified with the correlation name B.
+ERROR: Column adjPhotoAppraisal could not be found in the table/view identified with the correlation name B.
+ERROR: Expression using equals (=) has components that are of different data types.
+NOTE: PROC SQL set option NOEXEC and will continue to check the syntax of statements.
+2465       QUIT;
+NOTE: The SAS System stopped processing this step because of errors.
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.00 seconds
+      user cpu time       0.00 seconds
+      system cpu time     0.00 seconds
+      memory              6008.56k
+      OS Memory           40620.00k
+      Timestamp           10/30/2026 09:27:14 AM
+      Step Count                        706  Switch Count  0
+      Page Faults                       0
+      Page Reclaims                     145
+      Page Swaps                        0
+      Voluntary Context Switches        2
+      Involuntary Context Switches      0
+      Block Input Operations            16
+      Block Output Operations           8
+      
+2466       
+2467       /* merge region stuff */
+
+
+2468       PROC SQL;
+2469       	CREATE TABLE qlik_all As
+2470       		Select A.*
+2471       			, B.adjDirectRepairProgram as DRP_adj_rgn
+2472       			, b.adjMaterialDamageAdjuster as MDA_adj_rgn
+2473       			, b.adjEstimateDeskReview as EDR_adj_rgn
+2474       			, b.adjSalvage as SAL_adj_rgn
+2475       			, b.adjIndependentAdjuster as IA_adj_rgn	
+2476       			, b.adjPhotoAppraisal as PA_adj_rgn
+2477       			, 1 as DV_adj_rgn /*new */
+2478       	From qlik_all as A left join regn_adjs as B
+2479       		on A.region = B.region
+2480       		and A.adj_pos_dc = B.adj_pos_dc
+2481       		and a.payperiod = b.payperiod
+2482       	;
+ERROR: File WORK.QLIK_ALL.DATA does not exist.
+ERROR: Table WORK.REGN_ADJS doesn't have any columns. PROC SQL requires each of its tables to have at least 1 column.
+NOTE: PROC SQL set option NOEXEC and will continue to check the syntax of statements.
+2483       QUIT;
+NOTE: The SAS System stopped processing this step because of errors.
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.00 seconds
+      user cpu time       0.00 seconds
+      system cpu time     0.00 seconds
+      memory              324.28k
+      OS Memory           34980.00k
+      Timestamp           10/30/2026 09:27:14 AM
+      Step Count                        707  Switch Count  0
+      Page Faults                       0
+      Page Reclaims                     9
+      Page Swaps                        0
+      Voluntary Context Switches        0
+      Involuntary Context Switches      0
+      Block Input Operations            0
+      Block Output Operations           8
+      
+2484       
+
+
+2485       data qlik_all;
+2486       	set qlik_all;
+ERROR: File WORK.QLIK_ALL.DATA does not exist.
+2487       
+2488       	/* make matchin position descriptions for hours merge */
+2489       	if adj_pos_dc = 'Material Damage Adjuster' then
+2490       		adj_pos_dc = 'Field Adjuster';
+2491       run;
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.QLIK_ALL may be incomplete.  When this step was stopped there were 0 observations and 1 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      user cpu time       0.00 seconds
+      system cpu time     0.00 seconds
+      memory              748.12k
+      OS Memory           35496.00k
+      Timestamp           10/30/2026 09:27:14 AM
+      Step Count                        708  Switch Count  1
+      Page Faults                       6
+      Page Reclaims                     143
+      Page Swaps                        0
+      Voluntary Context Switches        5
+      Involuntary Context Switches      0
+      Block Input Operations            0
+      Block Output Operations           528
+      
+
+2492       
+2493       /* merge to hours / counts data */
+2494       PROC SQL;
+2495       	CREATE TABLE qlik_final As
+2496       		Select
+2497       			A.REGION,
+2498       			A.RPT_ENTITY,
+2499       			A.JOB_TTL,
+2500       			A.USR_NTRL_ID,
+2501       			A.EMP_NM,
+2502       			A.EMP_ID,
+2503       			A.SPVS_NM,
+2504       			A.SPVS_EMP_ID,
+2505       			A.PayperiodEnd,
+2506       			A.year,
+2507       			A.month,
+2508       			A.EmpIDPPE,
+2509       			A.PayperiodEnd_dt,
+2510       			A.EmpIDPPE_dt,
+2511       			A.DISCIPLINE,
+2512       			A.DISC_SEC,
+2513       			A.WRK_CLASS,
+2514       			A.LEADER_NM,
+2515       			A.LEADER_EMP_ID,
+2516       			A.PRIM_ROL_NM,
+2517       			A.MDA_Services_Complete,
+2518       			A.Direct_Repair_Program,
+2519       			A.Estimate_Desk_Review,
+2520       			A.Independent_Adjuster,
+2521       			A.Open_Shop,
+2522       			A.Photo_Appraisal,
+2523       			A.Salvage,
+2524       			A.DimVal,
+2525       			A.TotalRegHrsPaid,
+2526       			A.TotalOTHrsPaid,
+2527       			A.TotalPTOHrsPaid,
+2528       			B.final_adj_cap_MDA,
+2529       			B.final_adj_cap_DRP,
+2530       			B.final_adj_cap_EDR,
+2531       			B.final_adj_cap_IA,
+2532       			B.final_adj_cap_OS,
+2533       			B.final_adj_cap_PA,
+2534       			B.final_adj_cap_SAL,
+2535       			B.final_adj_cap_DV,
+2536       			B.vehicle_r_MDA,
+2537       			B.vehicle_r_DRP,
+2538       			B.vehicle_r_EDR,
+2539       			B.vehicle_r_IA,
+2540       			B.vehicle_r_OS,
+2541       			B.vehicle_r_PA,
+2542       			B.vehicle_r_SAL,
+2543       			B.vehicle_r_DV,
+2544       			B.service_area_r_MDA,
+2545       			B.service_area_r_MDA,
+2546       			B.service_area_r_DRP,
+2547       			B.service_area_r_EDR,
+2548       			B.service_area_r_IA,
+2549       			B.service_area_r_OS,
+2550       			B.service_area_r_PA,
+2551       			B.service_area_r_SAL,
+2552       			B.service_area_r_DV,
+2553       			B.incident_r_MDA,
+2554       			B.incident_r_MDA,
+2555       			B.incident_r_DRP,
+2556       			B.incident_r_EDR,
+2557       			B.incident_r_IA,
+2558       			B.incident_r_OS,
+2559       			B.incident_r_PA,
+2560       			B.incident_r_SAL,
+2561       			B.incident_r_DV,
+2562       			B.appraisal_r_MDA,
+2563       			B.appraisal_r_MDA,
+2564       			B.appraisal_r_DRP,
+2565       			B.appraisal_r_EDR,
+2566       			B.appraisal_r_IA,
+2567       			B.appraisal_r_OS,
+2568       			B.appraisal_r_PA,
+2569       			B.appraisal_r_SAL,
+2570       			B.appraisal_r_DV,
+2571       			B.MDA_adj_br,
+2572       			B.DRP_adj_br,
+2573       			B.EDR_adj_br,
+2574       			B.IA_adj_br,
+2575       			1 as OS_adj_br,
+2576       			B.PA_adj_br,
+2577       			B.SAL_adj_br,
+2578       			B.DV_adj_br,
+2579       			B.MDA_adj_rgn,
+2580       			B.DRP_adj_rgn,
+2581       			B.EDR_adj_rgn,
+2582       			B.IA_adj_rgn,
+2583       			1 as OS_adj_rgn,
+2584       			B.PA_adj_rgn,
+2585       			B.SAL_adj_rgn,
+2586       			B.DV_adj_rgn
+2587       		From mdl_curr.hcoutput as A left join qlik_all as B
+2588       			on B.EMP_ID = A.EMP_ID
+2589       			and B.adj_pos_dc = A.JOB_TTL
+2590       			and B.USR_RPT_BRNCH_DC = A.RPT_ENTITY
+2591       			and B.payperiod = A.PayperiodEnd_dt
+2592       	;
+ERROR: Column EMP_ID could not be found in the table/view identified with the correlation name B.
+ERROR: Column EMP_ID could not be found in the table/view identified with the correlation name B.
+ERROR: Column USR_RPT_BRNCH_DC could not be found in the table/view identified with the correlation name B.
+ERROR: Column USR_RPT_BRNCH_DC could not be found in the table/view identified with the correlation name B.
+ERROR: Column payperiod could not be found in the table/view identified with the correlation name B.
+ERROR: Column payperiod could not be found in the table/view identified with the correlation name B.
+ERROR: Column year could not be found in the table/view identified with the correlation name A.
+ERROR: Column month could not be found in the table/view identified with the correlation name A.
+ERROR: Column MDA_Services_Complete could not be found in the table/view identified with the correlation name A.
+ERROR: Column Direct_Repair_Program could not be found in the table/view identified with the correlation name A.
+ERROR: Column Estimate_Desk_Review could not be found in the table/view identified with the correlation name A.
+ERROR: Column Independent_Adjuster could not be found in the table/view identified with the correlation name A.
+ERROR: Column Open_Shop could not be found in the table/view identified with the correlation name A.
+ERROR: Column Photo_Appraisal could not be found in the table/view identified with the correlation name A.
+ERROR: Column final_adj_cap_MDA could not be found in the table/view identified with the correlation name B.
+ERROR: Column final_adj_cap_DRP could not be found in the table/view identified with the correlation name B.
+ERROR: Column final_adj_cap_EDR could not be found in the table/view identified with the correlation name B.
+ERROR: Column final_adj_cap_IA could not be found in the table/view identified with the correlation name B.
+ERROR: Column final_adj_cap_OS could not be found in the table/view identified with the correlation name B.
+ERROR: Column final_adj_cap_PA could not be found in the table/view identified with the correlation name B.
+ERROR: Column final_adj_cap_SAL could not be found in the table/view identified with the correlation name B.
+ERROR: Column final_adj_cap_DV could not be found in the table/view identified with the correlation name B.
+ERROR: Column vehicle_r_MDA could not be found in the table/view identified with the correlation name B.
+ERROR: Column vehicle_r_DRP could not be found in the table/view identified with the correlation name B.
+ERROR: Column vehicle_r_EDR could not be found in the table/view identified with the correlation name B.
+ERROR: Column vehicle_r_IA could not be found in the table/view identified with the correlation name B.
+ERROR: Column vehicle_r_OS could not be found in the table/view identified with the correlation name B.
+ERROR: Column vehicle_r_PA could not be found in the table/view identified with the correlation name B.
+ERROR: Column vehicle_r_SAL could not be found in the table/view identified with the correlation name B.
+ERROR: Column vehicle_r_DV could not be found in the table/view identified with the correlation name B.
+ERROR: Column service_area_r_MDA could not be found in the table/view identified with the correlation name B.
+ERROR: Column service_area_r_MDA could not be found in the table/view identified with the correlation name B.
+ERROR: Column service_area_r_DRP could not be found in the table/view identified with the correlation name B.
+ERROR: Column service_area_r_EDR could not be found in the table/view identified with the correlation name B.
+ERROR: Column service_area_r_IA could not be found in the table/view identified with the correlation name B.
+ERROR: Column service_area_r_OS could not be found in the table/view identified with the correlation name B.
+ERROR: Column service_area_r_PA could not be found in the table/view identified with the correlation name B.
+ERROR: Column service_area_r_SAL could not be found in the table/view identified with the correlation name B.
+ERROR: Column service_area_r_DV could not be found in the table/view identified with the correlation name B.
+ERROR: Column incident_r_MDA could not be found in the table/view identified with the correlation name B.
+ERROR: Column incident_r_MDA could not be found in the table/view identified with the correlation name B.
+ERROR: Column incident_r_DRP could not be found in the table/view identified with the correlation name B.
+ERROR: Column incident_r_EDR could not be found in the table/view identified with the correlation name B.
+ERROR: Column incident_r_IA could not be found in the table/view identified with the correlation name B.
+ERROR: Column incident_r_OS could not be found in the table/view identified with the correlation name B.
+ERROR: Column incident_r_PA could not be found in the table/view identified with the correlation name B.
+ERROR: Column incident_r_SAL could not be found in the table/view identified with the correlation name B.
+ERROR: Column incident_r_DV could not be found in the table/view identified with the correlation name B.
+ERROR: Column appraisal_r_MDA could not be found in the table/view identified with the correlation name B.
+ERROR: Column appraisal_r_MDA could not be found in the table/view identified with the correlation name B.
+ERROR: Column appraisal_r_DRP could not be found in the table/view identified with the correlation name B.
+ERROR: Column appraisal_r_EDR could not be found in the table/view identified with the correlation name B.
+ERROR: Column appraisal_r_IA could not be found in the table/view identified with the correlation name B.
+ERROR: Column appraisal_r_OS could not be found in the table/view identified with the correlation name B.
+ERROR: Column appraisal_r_PA could not be found in the table/view identified with the correlation name B.
+ERROR: Column appraisal_r_SAL could not be found in the table/view identified with the correlation name B.
+ERROR: Column appraisal_r_DV could not be found in the table/view identified with the correlation name B.
+ERROR: Column MDA_adj_br could not be found in the table/view identified with the correlation name B.
+ERROR: Column DRP_adj_br could not be found in the table/view identified with the correlation name B.
+ERROR: Column EDR_adj_br could not be found in the table/view identified with the correlation name B.
+ERROR: Column IA_adj_br could not be found in the table/view identified with the correlation name B.
+ERROR: Column PA_adj_br could not be found in the table/view identified with the correlation name B.
+ERROR: Column SAL_adj_br could not be found in the table/view identified with the correlation name B.
+ERROR: Column DV_adj_br could not be found in the table/view identified with the correlation name B.
+ERROR: Column MDA_adj_rgn could not be found in the table/view identified with the correlation name B.
+ERROR: Column DRP_adj_rgn could not be found in the table/view identified with the correlation name B.
+ERROR: Column EDR_adj_rgn could not be found in the table/view identified with the correlation name B.
+ERROR: Column IA_adj_rgn could not be found in the table/view identified with the correlation name B.
+ERROR: Column PA_adj_rgn could not be found in the table/view identified with the correlation name B.
+ERROR: Column SAL_adj_rgn could not be found in the table/view identified with the correlation name B.
+ERROR: Column DV_adj_rgn could not be found in the table/view identified with the correlation name B.
+ERROR: Expression using equals (=) has components that are of different data types.
+NOTE: PROC SQL set option NOEXEC and will continue to check the syntax of statements.
+2593       QUIT;
+NOTE: The SAS System stopped processing this step because of errors.
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.00 seconds
+      user cpu time       0.01 seconds
+      system cpu time     0.00 seconds
+      memory              6474.15k
+      OS Memory           41136.00k
+      Timestamp           10/30/2026 09:27:14 AM
+      Step Count                        709  Switch Count  0
+      Page Faults                       0
+      Page Reclaims                     211
+      Page Swaps                        0
+      Voluntary Context Switches        9
+      Involuntary Context Switches      0
+      Block Input Operations            544
+      Block Output Operations           40
+      
+2594       
+
+
+2595       proc sql;
+2596       	create table duplicates as
+2597       		select *
+2598       			from qlik_final
+2599       				group by EMP_ID, PayperiodEnd_dt
+2600       					having count(*) gt 1;
+ERROR: File WORK.QLIK_FINAL.DATA does not exist.
+NOTE: PROC SQL set option NOEXEC and will continue to check the syntax of statements.
+2601       quit;
+NOTE: The SAS System stopped processing this step because of errors.
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.00 seconds
+      user cpu time       0.00 seconds
+      system cpu time     0.00 seconds
+      memory              170.06k
+      OS Memory           34980.00k
+      Timestamp           10/30/2026 09:27:14 AM
+      Step Count                        710  Switch Count  0
+      Page Faults                       0
+      Page Reclaims                     9
+      Page Swaps                        0
+      Voluntary Context Switches        0
+      Involuntary Context Switches      0
+      Block Input Operations            0
+      Block Output Operations           0
+      
+2602       
+2603       /* fill in 1.0s */
+
+
+2604       data qlik_final (drop=i);
+2605       	set qlik_final;
+ERROR: File WORK.QLIK_FINAL.DATA does not exist.
+2606       
+2607       	/* file in 1.00 for missing factors */
+2608       	array N[*] final_adj_cap_MDA --  SAL_adj_rgn;
+ERROR: Variable final_adj_cap_MDA cannot be found on the list of previously defined variables.
+WARNING: Defining an array with zero elements.
+2609       
+2610       	do i=1 to hbound(N);
+2611       		if N[i]=. then
+2612       			N[i]=1;
+2613       	end;
+2614       run;
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.QLIK_FINAL may be incomplete.  When this step was stopped there were 0 observations and 0 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      user cpu time       0.00 seconds
+      system cpu time     0.00 seconds
+      memory              392.03k
+      OS Memory           34980.00k
+      Timestamp           10/30/2026 09:27:14 AM
+      Step Count                        711  Switch Count  1
+      Page Faults                       6
+      Page Reclaims                     16
+      Page Swaps                        0
+      Voluntary Context Switches        6
+      Involuntary Context Switches      0
+      Block Input Operations            8
+      Block Output Operations           168
+      
+
+2615       
+2616       data qlik_final;
+2617       	set qlik_final;
+2618       	keep REGION RPT_ENTITY JOB_TTL USR_NTRL_ID EMP_NM EMP_ID SPVS_NM SPVS_EMP_ID
+2619       		PayperiodEnd year month EmpIDPPE PayperiodEnd_dt EmpIDPPE_dt
+2620       		DISCIPLINE DISC_SEC WRK_CLASS LEADER_NM LEADER_EMP_ID PRIM_ROL_NM
+2621       		MDA_Services_Complete Direct_Repair_Program Estimate_Desk_Review
+2622       		Independent_Adjuster Open_Shop Photo_Appraisal Salvage DimVal
+2623       		TotalRegHrsPaid TotalOTHrsPaid TotalPTOHrsPaid
+2624       		final_adj_cap_MDA final_adj_cap_DRP final_adj_cap_EDR final_adj_cap_IA
+2625       		final_adj_cap_OS final_adj_cap_PA final_adj_cap_SAL final_adj_cap_DV
+2626       		vehicle_r_MDA vehicle_r_DRP vehicle_r_EDR vehicle_r_IA vehicle_r_OS
+2627       		vehicle_r_PA vehicle_r_SAL vehicle_r_DV
+2628       		service_area_r_MDA service_area_r_DRP service_area_r_EDR service_area_r_IA service_area_r_OS
+2629       		service_area_r_PA service_area_r_SAL service_area_r_DV
+2630       		incident_r_MDA incident_r_DRP incident_r_EDR incident_r_IA incident_r_OS incident_r_PA
+2631       		incident_r_SAL incident_r_DV
+2632       		appraisal_r_MDA appraisal_r_DRP appraisal_r_EDR appraisal_r_IA appraisal_r_OS appraisal_r_PA
+2633       		appraisal_r_SAL appraisal_r_DV
+2634       		MDA_adj_br DRP_adj_br EDR_adj_br IA_adj_br OS_adj_br PA_adj_br SAL_adj_br DV_adj_br
+2635       		MDA_adj_rgn DRP_adj_rgn EDR_adj_rgn IA_adj_rgn OS_adj_rgn PA_adj_rgn SAL_adj_rgn DV_adj_rgn;
+2636       run;
+
+WARNING: The variable REGION in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable RPT_ENTITY in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable JOB_TTL in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable USR_NTRL_ID in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable EMP_NM in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable EMP_ID in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable SPVS_NM in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable SPVS_EMP_ID in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable PayperiodEnd in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable year in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable month in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable EmpIDPPE in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable PayperiodEnd_dt in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable EmpIDPPE_dt in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable DISCIPLINE in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable DISC_SEC in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable WRK_CLASS in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable LEADER_NM in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable LEADER_EMP_ID in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable PRIM_ROL_NM in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable MDA_Services_Complete in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable Direct_Repair_Program in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable Estimate_Desk_Review in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable Independent_Adjuster in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable Open_Shop in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable Photo_Appraisal in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable Salvage in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable DimVal in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable TotalRegHrsPaid in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable TotalOTHrsPaid in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable TotalPTOHrsPaid in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable final_adj_cap_MDA in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable final_adj_cap_DRP in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable final_adj_cap_EDR in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable final_adj_cap_IA in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable final_adj_cap_OS in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable final_adj_cap_PA in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable final_adj_cap_SAL in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable final_adj_cap_DV in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable vehicle_r_MDA in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable vehicle_r_DRP in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable vehicle_r_EDR in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable vehicle_r_IA in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable vehicle_r_OS in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable vehicle_r_PA in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable vehicle_r_SAL in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable vehicle_r_DV in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable service_area_r_MDA in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable service_area_r_DRP in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable service_area_r_EDR in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable service_area_r_IA in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable service_area_r_OS in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable service_area_r_PA in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable service_area_r_SAL in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable service_area_r_DV in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable incident_r_MDA in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable incident_r_DRP in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable incident_r_EDR in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable incident_r_IA in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable incident_r_OS in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable incident_r_PA in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable incident_r_SAL in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable incident_r_DV in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable appraisal_r_MDA in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable appraisal_r_DRP in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable appraisal_r_EDR in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable appraisal_r_IA in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable appraisal_r_OS in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable appraisal_r_PA in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable appraisal_r_SAL in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable appraisal_r_DV in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable MDA_adj_br in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable DRP_adj_br in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable EDR_adj_br in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable IA_adj_br in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable OS_adj_br in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable PA_adj_br in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable SAL_adj_br in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable DV_adj_br in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable MDA_adj_rgn in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable DRP_adj_rgn in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable EDR_adj_rgn in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable IA_adj_rgn in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable OS_adj_rgn in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable PA_adj_rgn in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable SAL_adj_rgn in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable DV_adj_rgn in the DROP, KEEP, or RENAME list has never been referenced.
+NOTE: There were 0 observations read from the data set WORK.QLIK_FINAL.
+NOTE: The data set WORK.QLIK_FINAL has 0 observations and 0 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      user cpu time       0.00 seconds
+      system cpu time     0.00 seconds
+      memory              609.81k
+      OS Memory           34980.00k
+      Timestamp           10/30/2026 09:27:14 AM
+      Step Count                        712  Switch Count  1
+      Page Faults                       7
+      Page Reclaims                     21
+      Page Swaps                        0
+      Voluntary Context Switches        6
+      Involuntary Context Switches      0
+      Block Input Operations            8
+      Block Output Operations           200
+      
+
+2637       
+2638       /* transpose completed services file */
+2639       PROC SQL;
+2640       	CREATE TABLE qa_completed As
+2641       		Select b.EMP_ID
+2642       			,b.JOB_TTL
+2643       			,b.RPT_ENTITY
+2644       			,b.PayperiodEnd_dt
+2645       			,b.Direct_Repair_Program as DirectRepairProgram
+2646       			,b.MDA_Services_Complete as MaterialDamageAdjuster
+2647       			,b.Estimate_Desk_Review as EstimateDeskReview
+2648       			,b.Salvage
+2649       			,b.Open_Shop as OpenShop
+2650       			,b.Independent_Adjuster as IndependentAdjuster
+2651       			,b.Photo_Appraisal as PhotoAppraisal
+2652       			,b.DimVal
+2653       		From mdl_curr.hcoutput as b
+2654       	;
+ERROR: Column Direct_Repair_Program could not be found in the table/view identified with the correlation name B.
+ERROR: Column MDA_Services_Complete could not be found in the table/view identified with the correlation name B.
+ERROR: Column Estimate_Desk_Review could not be found in the table/view identified with the correlation name B.
+ERROR: Column Open_Shop could not be found in the table/view identified with the correlation name B.
+ERROR: Column Independent_Adjuster could not be found in the table/view identified with the correlation name B.
+ERROR: Column Photo_Appraisal could not be found in the table/view identified with the correlation name B.
+NOTE: PROC SQL set option NOEXEC and will continue to check the syntax of statements.
+2655       QUIT;
+NOTE: The SAS System stopped processing this step because of errors.
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.00 seconds
+      user cpu time       0.00 seconds
+      system cpu time     0.00 seconds
+      memory              5770.37k
+      OS Memory           40620.00k
+      Timestamp           10/30/2026 09:27:14 AM
+      Step Count                        713  Switch Count  0
+      Page Faults                       0
+      Page Reclaims                     140
+      Page Swaps                        0
+      Voluntary Context Switches        7
+      Involuntary Context Switches      0
+      Block Input Operations            544
+      Block Output Operations           0
+      
+2656       
+
+
+2657       proc sort data= qa_completed;
+ERROR: File WORK.QA_COMPLETED.DATA does not exist.
+2658       	by EMP_ID RPT_ENTITY PayperiodEnd_dt JOB_TTL;
+2659       run;
+
+NOTE: The SAS System stopped processing this step because of errors.
+NOTE: PROCEDURE SORT used (Total process time):
+      real time           0.00 seconds
+      user cpu time       0.00 seconds
+      system cpu time     0.00 seconds
+      memory              22.25k
+      OS Memory           34980.00k
+      Timestamp           10/30/2026 09:27:14 AM
+      Step Count                        714  Switch Count  0
+      Page Faults                       0
+      Page Reclaims                     9
+      Page Swaps                        0
+      Voluntary Context Switches        0
+      Involuntary Context Switches      0
+      Block Input Operations            0
+      Block Output Operations           0
+      
+2660       
+2661       /* transpose wide to long */
+
+
+2662       proc transpose data=qa_completed out=qa_completed_w /*prefix=adj*/;
+ERROR: File WORK.QA_COMPLETED.DATA does not exist.
+2663       	by EMP_ID RPT_ENTITY PayperiodEnd_dt JOB_TTL;
+2664       
+2665       	/*	    id SEL_APPR_TYP_DC;*/
+2666       	var DirectRepairProgram -- DimVal;
+2667       run;
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.QA_COMPLETED_W may be incomplete.  When this step was stopped there were 0 observations and 0 variables.
+NOTE: PROCEDURE TRANSPOSE used (Total process time):
+      real time           0.00 seconds
+      user cpu time       0.00 seconds
+      system cpu time     0.00 seconds
+      memory              193.40k
+      OS Memory           34980.00k
+      Timestamp           10/30/2026 09:27:14 AM
+      Step Count                        715  Switch Count  1
+      Page Faults                       0
+      Page Reclaims                     9
+      Page Swaps                        0
+      Voluntary Context Switches        6
+      Involuntary Context Switches      0
+      Block Input Operations            0
+      Block Output Operations           168
+      
+2668       
+
+
+2669       data ind_report2;
+2670       	set ind_report;
+2671       
+2672       	if adj_pos_dc = 'Material Damage Adjuster' then
+2673       		adj_pos_dc = 'Field Adjuster';
+2674       run;
+
+NOTE: There were 54342 observations read from the data set WORK.IND_REPORT.
+NOTE: The data set WORK.IND_REPORT2 has 54342 observations and 23 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.01 seconds
+      user cpu time       0.01 seconds
+      system cpu time     0.00 seconds
+      memory              1352.90k
+      OS Memory           36012.00k
+      Timestamp           10/30/2026 09:27:14 AM
+      Step Count                        716  Switch Count  1
+      Page Faults                       6
+      Page Reclaims                     221
+      Page Swaps                        0
+      Voluntary Context Switches        7
+      Involuntary Context Switches      0
+      Block Input Operations            0
+      Block Output Operations           33296
+      
+
+2675       
+2676       /* merge */
+2677       PROC SQL;
+2678       	CREATE TABLE qlik_adj1 As
+2679       		Select b._NAME_ as SEL_APPR_TYP_DC
+2680       			,b.EMP_ID
+2681       			,a.region as REGION
+2682       			,b.RPT_ENTITY
+2683       			,b.JOB_TTL
+2684       			,b.PayperiodEnd_dt as PayPeriodEnd_dt
+2685       			,cat(b.EMP_ID,year(b.PayperiodEnd_dt),put(month(b.PayperiodEnd_dt),z2.),put(day(b.PayperiodEnd_dt),z2.)) as
+2685     ! EmpIDPPE_dt
+2686       			,b.col1 as Closed_Svc
+2687       			,coalesce(a.norm_adj,1) as norm_adj
+2688       			,a.vehicle_r
+2689       			,a.service_area_r
+2690       			,a.incident_r
+2691       			,a.appraisal_r
+2692       		From qa_completed_w as b
+2693       			left join ind_report2 as a
+2694       				on A.SEL_APPR_TYP_DC = b._NAME_
+2695       				and b.EMP_ID = a.EMP_ID
+2696       				and B.RPT_ENTITY = a.USR_RPT_BRNCH_DC
+2697       				and B.JOB_TTL = a.ADJ_POS_DC
+2698       				and B.PayperiodEnd_dt = a.PayPeriod
+2699       	;
+ERROR: Table WORK.QA_COMPLETED_W doesn't have any columns. PROC SQL requires each of its tables to have at least 1 column.
+ERROR: Column _NAME_ could not be found in the table/view identified with the correlation name B.
+ERROR: Column _NAME_ could not be found in the table/view identified with the correlation name B.
+ERROR: Column EMP_ID could not be found in the table/view identified with the correlation name B.
+ERROR: Column EMP_ID could not be found in the table/view identified with the correlation name B.
+ERROR: Column RPT_ENTITY could not be found in the table/view identified with the correlation name B.
+ERROR: Column RPT_ENTITY could not be found in the table/view identified with the correlation name B.
+ERROR: Column JOB_TTL could not be found in the table/view identified with the correlation name B.
+ERROR: Column JOB_TTL could not be found in the table/view identified with the correlation name B.
+ERROR: Column PayperiodEnd_dt could not be found in the table/view identified with the correlation name B.
+ERROR: Column PayperiodEnd_dt could not be found in the table/view identified with the correlation name B.
+ERROR: Column _NAME_ could not be found in the table/view identified with the correlation name B.
+ERROR: Column EMP_ID could not be found in the table/view identified with the correlation name B.
+ERROR: Column RPT_ENTITY could not be found in the table/view identified with the correlation name B.
+ERROR: Column JOB_TTL could not be found in the table/view identified with the correlation name B.
+ERROR: Column PayperiodEnd_dt could not be found in the table/view identified with the correlation name B.
+ERROR: Column EMP_ID could not be found in the table/view identified with the correlation name B.
+ERROR: Column PayperiodEnd_dt could not be found in the table/view identified with the correlation name B.
+ERROR: Column PayperiodEnd_dt could not be found in the table/view identified with the correlation name B.
+ERROR: Column PayperiodEnd_dt could not be found in the table/view identified with the correlation name B.
+ERROR: Column col1 could not be found in the table/view identified with the correlation name B.
+ERROR: Expression using equals (=) has components that are of different data types.
+ERROR: Function YEAR requires a numeric expression as argument 1.
+ERROR: Function MONTH requires a numeric expression as argument 1.
+ERROR: Numeric format Z in PUT function requires a numeric argument.
+ERROR: Function DAY requires a numeric expression as argument 1.
+ERROR: Numeric format Z in PUT function requires a numeric argument.
+NOTE: PROC SQL set option NOEXEC and will continue to check the syntax of statements.
+2700       QUIT;
+NOTE: The SAS System stopped processing this step because of errors.
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.00 seconds
+      user cpu time       0.00 seconds
+      system cpu time     0.00 seconds
+      memory              6005.37k
+      OS Memory           40620.00k
+      Timestamp           10/30/2026 09:27:14 AM
+      Step Count                        717  Switch Count  0
+      Page Faults                       0
+      Page Reclaims                     145
+      Page Swaps                        0
+      Voluntary Context Switches        0
+      Involuntary Context Switches      0
+      Block Input Operations            0
+      Block Output Operations           16
+      
+2701       
+
+
+2702       data qlik_adj1;
+2703       	set qlik_adj1;
+ERROR: File WORK.QLIK_ADJ1.DATA does not exist.
+2704       	where not missing(Closed_Svc);
+2705       run;
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.QLIK_ADJ1 may be incomplete.  When this step was stopped there were 0 observations and 0 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      user cpu time       0.00 seconds
+      system cpu time     0.00 seconds
+      memory              398.84k
+      OS Memory           34980.00k
+      Timestamp           10/30/2026 09:27:14 AM
+      Step Count                        718  Switch Count  1
+      Page Faults                       6
+      Page Reclaims                     15
+      Page Swaps                        0
+      Voluntary Context Switches        6
+      Involuntary Context Switches      0
+      Block Input Operations            0
+      Block Output Operations           176
+      
+
+2706       
+2707       data qlik_adj1;
+2708       	set qlik_adj1;
+2709       	keep SEL_APPR_TYP_DC EMP_ID REGION RPT_ENTITY JOB_TTL PayPeriodEnd_dt
+2710       		EmpIDPPE_dt Closed_Svc norm_adj vehicle_r service_area_r incident_r appraisal_r;
+2711       run;
+
+WARNING: The variable SEL_APPR_TYP_DC in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable EMP_ID in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable REGION in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable RPT_ENTITY in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable JOB_TTL in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable PayPeriodEnd_dt in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable EmpIDPPE_dt in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable Closed_Svc in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable norm_adj in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable vehicle_r in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable service_area_r in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable incident_r in the DROP, KEEP, or RENAME list has never been referenced.
+WARNING: The variable appraisal_r in the DROP, KEEP, or RENAME list has never been referenced.
+NOTE: There were 0 observations read from the data set WORK.QLIK_ADJ1.
+NOTE: The data set WORK.QLIK_ADJ1 has 0 observations and 0 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      user cpu time       0.00 seconds
+      system cpu time     0.00 seconds
+      memory              595.40k
+      OS Memory           34980.00k
+      Timestamp           10/30/2026 09:27:14 AM
+      Step Count                        719  Switch Count  1
+      Page Faults                       6
+      Page Reclaims                     20
+      Page Swaps                        0
+      Voluntary Context Switches        5
+      Involuntary Context Switches      2
+      Block Input Operations            0
+      Block Output Operations           176
+      
+
+2712       
+2713       /* excel output */
+2714       %macro ExportCustom();
+2715       	%if &flag. = 1 %then
+2716       		%do;
+2717       
+2718       			proc export data=qlik_final
+2719       				outfile="/ere/local/shared/actuarial/Share/Claims/WPC/Material
+2719     ! Damage/executable/Output/MaterialDamage-QlikSuperfile.xlsx"
+2720       				dbms=xlsx
+2721       				replace;
+2722       			run;
+2723       
+2724       			/* excel output */
+2725       			proc export data=qlik_adj1
+2726       				outfile="/ere/local/shared/actuarial/Share/Claims/WPC/Material
+2726     ! Damage/executable/Output/MaterialDamage-QlikAdjustments.xlsx"
+2727       				dbms=xlsx
+2728       				replace;
+2729       			run;
+2730       
+2731       		%end;
+2732       	%else
+2733       		%do;
+2734       
+2735       			proc export data=qlik_final
+2736       				outfile="&output_path_csv/MaterialDamage-QlikSuperfile.xlsx"
+2737       				dbms=xlsx
+2738       				replace;
+2739       			run;
+2740       
+2741       			/* excel output */
+2742       			proc export data=qlik_adj1
+2743       				outfile="&output_path_csv/MaterialDamage-QlikAdjustments.xlsx"
+2744       				dbms=xlsx
+2745       				replace;
+2746       			run;
+2747       
+2748       		%end;
+2749       %mend ExportCustom;
+2750       
+2751       %ExportCustom();;*';*";*/;quit;run;
+
+There are no variables for the output file
+ERROR: Export unsuccessful.  See SAS Log for details.
+NOTE: The SAS System stopped processing this step because of errors.
+NOTE: PROCEDURE EXPORT used (Total process time):
+      real time           0.00 seconds
+      user cpu time       0.00 seconds
+      system cpu time     0.00 seconds
+      memory              777.53k
+      OS Memory           35476.00k
+      Timestamp           10/30/2026 09:27:14 AM
+      Step Count                        720  Switch Count  0
+      Page Faults                       25
+      Page Reclaims                     146
+      Page Swaps                        0
+      Voluntary Context Switches        4
+      Involuntary Context Switches      0
+      Block Input Operations            40
+      Block Output Operations           0
+      
+
+
+
+There are no variables for the output file
+ERROR: Export unsuccessful.  See SAS Log for details.
+NOTE: The SAS System stopped processing this step because of errors.
+NOTE: PROCEDURE EXPORT used (Total process time):
+      real time           0.00 seconds
+      user cpu time       0.00 seconds
+      system cpu time     0.00 seconds
+      memory              776.53k
+      OS Memory           35476.00k
+      Timestamp           10/30/2026 09:27:14 AM
+      Step Count                        721  Switch Count  0
+      Page Faults                       0
+      Page Reclaims                     132
+      Page Swaps                        0
+      Voluntary Context Switches        1
+      Involuntary Context Switches      0
+      Block Input Operations            0
+      Block Output Operations           0
+      
+2752                       ods html5 (id=saspy_internal) close;
+2753                       ods listing;
+2754       
