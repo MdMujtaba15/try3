@@ -1,66 +1,46 @@
-2026-10-30 19:10:11,045 - lob.base - INFO - Prior month Folder Date is : 09-30-2026
-2026-10-30 19:10:11,090 - lob.base - INFO - self.src: /ere/local/shared/actuarial/Share/Claims/WPC/TESTING 2/WPC Streamlining Project/Central Scripts Repository/Material Damage V2/Source
-2026-10-30 19:10:11,109 - lob.base - INFO - --------------------Execution started for script: 1 Combine Hours and Counts Data.sas--------------------
-2026-10-30 19:10:11,202 - lob.base - INFO - Input parameters to the script: {'endppd': '10-28-2026', 'cutoff': '04-01-2023'}
-2026-10-30 19:10:28,433 - lob.base - INFO - SAS script 1 executed successfully
-2026-10-30 19:10:28,435 - lob.base - INFO - Output: adj_decode.sas7bdat and hcoutput.sas7bdat
-2026-10-30 19:10:28,437 - lob.base - INFO - Execution Time: 0 min 17 sec
-2026-10-30 19:10:28,439 - lob.base - INFO - --------------------Execution ends: 1 Combine Hours and Counts Data.sas--------------------
-2026-10-30 19:10:28,440 - lob.base - INFO - --------------------Execution started for script: 2 Adjuster Addresses v2.sas--------------------
-2026-10-30 19:10:28,763 - lob.base - INFO - SAS script 2 executed successfully
-2026-10-30 19:10:28,765 - lob.base - INFO - Output: No Physical file
-2026-10-30 19:10:28,767 - lob.base - INFO - Execution Time: 0 min 0 sec
-2026-10-30 19:10:28,769 - lob.base - INFO - --------------------Execution ends: 2 Adjuster Addresses v2.sas--------------------
-2026-10-30 19:10:28,776 - lob.base - INFO - --------------------Execution started for script: 3 New MDA Data Pull v2.sas--------------------
-2026-10-30 19:10:28,880 - lob.base - INFO - Input parameters to the script: {'last_folder': '10-28-2026', 'year': 2026, 'from_dt': "'01APRIL2023:00:00:00'", 'to_dt': "'28OCTOBER2026:23:59:59'", 'flag': 0, 'output_path_csv': '/ere/local/shared/actuarial/Share/Claims/WPC/TESTING 2/Material Damage V2/2026/10-28-2026'}
-2026-10-30 20:26:06,018 - lob.base - INFO - SAS script 3 executed successfully
-2026-10-30 20:26:06,023 - lob.base - INFO - Output: CBscoringv2.csv and for_pythonscoring.sas7bdat
-2026-10-30 20:26:06,026 - lob.base - INFO - Execution Time: 75 min 37 sec
-2026-10-30 20:26:06,027 - lob.base - INFO - --------------------Execution ends: 3 New MDA Data Pull v2.sas--------------------
-2026-10-30 20:26:06,030 - lob.base - INFO - --------------------Execution started for script: 4 Scoring File PSI.sas--------------------
-2026-10-30 20:26:06,128 - lob.base - INFO - Input parameters to the script: {'last_folder': '10-28-2026', 'year': 2026, 'saveLoc': 'A:/Share/Claims/WPC/TESTING 2/Material Damage V2/2026/10-28-2026'}
-2026-10-30 20:27:26,243 - lob.base - INFO - Execution Time: 1 min 20 sec
-2026-10-30 20:27:26,244 - lob.base - INFO - --------------------Execution ends: 4 Scoring File PSI.sas--------------------
-2026-10-30 20:27:26,246 - lob.base - INFO - --------------------Execution started for script: 5 2025 Scoring--------------------
-2026-10-30 20:27:26,248 - lob.base - INFO - Importing Data...
-2026-10-30 20:27:26,397 - lob.base - ERROR - Traceback (most recent call last):
-  File "C:\Users\XH787\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pandas\io\parsers\c_parser_wrapper.py", line 215, in read
-    chunks = self._reader.read_low_memory(nrows)
-  File "pandas/_libs/parsers.pyx", line 857, in pandas._libs.parsers.TextReader.read_low_memory
-StopIteration
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "a:\Share\Claims\WPC\TESTING 2\WPCv2\wpc-streamlining\utils.py", line 53, in inner
-    func(self, *args, **kwargs)
-    ~~~~^^^^^^^^^^^^^^^^^^^^^^^
-  File "a:\Share\Claims\WPC\TESTING 2\WPCv2\wpc-streamlining\lob\material_damage.py", line 666, in step_5
-    df = pd.read_csv(df_path, index_col="SVC_REQ_NR")
-  File "C:\Users\XH787\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pandas\io\parsers\readers.py", line 873, in read_csv
-    return _read(filepath_or_buffer, kwds)
-  File "C:\Users\XH787\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pandas\io\parsers\readers.py", line 306, in _read
-    return parser.read(nrows)
-           ~~~~~~~~~~~^^^^^^^
-  File "C:\Users\XH787\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pandas\io\parsers\readers.py", line 1947, in read
-    ) = self._engine.read(  # type: ignore[attr-defined]
-        ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-        nrows
-        ^^^^^
-    )
-    ^
-  File "C:\Users\XH787\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pandas\io\parsers\c_parser_wrapper.py", line 230, in read
-    index, columns, col_dict = self._get_empty_meta(
-                               ~~~~~~~~~~~~~~~~~~~~^
-        names,
-        ^^^^^^
-        dtype=self.dtype,
-        ^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "C:\Users\XH787\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pandas\io\parsers\base_parser.py", line 754, in _get_empty_meta
-    columns.pop(n - i)
-                ~~^~~
-TypeError: unsupported operand type(s) for -: 'str' and 'int'
-2026-10-30 20:34:02,032 - lob.base - ERROR - xxxxxxxxxx Error while executing script: 5 2025 Scoring xxxxxxxxxx
-2026-10-30 20:34:02,069 - lob.base - INFO - Execution Time: 6 min 35 sec
+2026-10-30 21:33:15,958 - lob.base - INFO - Prior month Folder Date is : 09-30-2026
+2026-10-30 21:33:15,960 - lob.base - INFO - self.src: /ere/local/shared/actuarial/Share/Claims/WPC/TESTING 2/WPC Streamlining Project/Central Scripts Repository/Material Damage V2/Source
+2026-10-30 21:33:15,961 - lob.base - INFO - --------------------Execution started for script: 1 Combine Hours and Counts Data.sas--------------------
+2026-10-30 21:33:16,019 - lob.base - INFO - Input parameters to the script: {'endppd': '10-28-2026', 'cutoff': '04-01-2023'}
+2026-10-30 21:33:32,694 - lob.base - INFO - SAS script 1 executed successfully
+2026-10-30 21:33:32,696 - lob.base - INFO - Output: adj_decode.sas7bdat and hcoutput.sas7bdat
+2026-10-30 21:33:32,697 - lob.base - INFO - Execution Time: 0 min 16 sec
+2026-10-30 21:33:32,698 - lob.base - INFO - --------------------Execution ends: 1 Combine Hours and Counts Data.sas--------------------
+2026-10-30 21:33:32,699 - lob.base - INFO - --------------------Execution started for script: 2 Adjuster Addresses v2.sas--------------------
+2026-10-30 21:33:32,994 - lob.base - INFO - SAS script 2 executed successfully
+2026-10-30 21:33:32,995 - lob.base - INFO - Output: No Physical file
+2026-10-30 21:33:32,996 - lob.base - INFO - Execution Time: 0 min 0 sec
+2026-10-30 21:33:33,027 - lob.base - INFO - --------------------Execution ends: 2 Adjuster Addresses v2.sas--------------------
+2026-10-30 21:33:33,048 - lob.base - INFO - --------------------Execution started for script: 3 New MDA Data Pull v2.sas--------------------
+2026-10-30 21:33:33,163 - lob.base - INFO - Input parameters to the script: {'last_folder': '10-28-2026', 'year': 2026, 'from_dt': "'01APRIL2023:00:00:00'", 'to_dt': "'28OCTOBER2026:23:59:59'", 'flag': 0, 'output_path_csv': '/ere/local/shared/actuarial/Share/Claims/WPC/TESTING 2/Material Damage V2/2026/10-28-2026'}
+2026-10-30 22:48:39,421 - lob.base - INFO - SAS script 3 executed successfully
+2026-10-30 22:48:39,426 - lob.base - INFO - Output: CBscoringv2.csv and for_pythonscoring.sas7bdat
+2026-10-30 22:48:39,428 - lob.base - INFO - Execution Time: 75 min 6 sec
+2026-10-30 22:48:39,429 - lob.base - INFO - --------------------Execution ends: 3 New MDA Data Pull v2.sas--------------------
+2026-10-30 22:48:39,431 - lob.base - INFO - --------------------Execution started for script: 4 Scoring File PSI.sas--------------------
+2026-10-30 22:48:39,497 - lob.base - INFO - Input parameters to the script: {'last_folder': '10-28-2026', 'year': 2026, 'saveLoc': 'A:/Share/Claims/WPC/TESTING 2/Material Damage V2/2026/10-28-2026'}
+2026-10-30 22:50:10,277 - lob.base - INFO - Execution Time: 1 min 30 sec
+2026-10-30 22:50:10,279 - lob.base - INFO - --------------------Execution ends: 4 Scoring File PSI.sas--------------------
+2026-10-30 22:50:10,281 - lob.base - INFO - --------------------Execution started for script: 5 2025 Scoring--------------------
+2026-10-30 22:50:10,285 - lob.base - INFO - Importing Data...
+2026-10-30 22:50:19,416 - lob.base - INFO - # of records: 1744616
+2026-10-30 22:50:19,418 - lob.base - INFO - # of columns: 25
+2026-10-30 22:50:46,943 - lob.base - INFO - Importing python Model...
+2026-10-30 23:29:00,725 - lob.base - INFO - Exporting Output...
+2026-10-30 23:30:34,295 - lob.base - INFO - Python model executed successfully
+2026-10-30 23:30:34,301 - lob.base - INFO - SAS script 5 executed successfully
+2026-10-30 23:30:34,305 - lob.base - INFO - Output: model_out.csv
+2026-10-30 23:30:42,109 - lob.base - INFO - Execution Time: 40 min 31 sec
+2026-10-30 23:30:42,112 - lob.base - INFO - --------------------Execution ends: 5 2025 Scoring--------------------
+2026-10-30 23:30:42,114 - lob.base - INFO - --------------------Execution started for script: 6 Import and Prep Python Output v2 Superfile Fixes.sas--------------------
+2026-10-30 23:30:42,274 - lob.base - INFO - Input parameters to the script: {'last_folder': '10-28-2026', 'year': 2026, 'flag': 0, 'output_path_csv': '/ere/local/shared/actuarial/Share/Claims/WPC/TESTING 2/Material Damage V2/2026/10-28-2026'}
+2026-10-30 23:31:13,934 - lob.base - INFO - Execution Time: 0 min 31 sec
+2026-10-30 23:31:13,937 - lob.base - INFO - --------------------Execution ends: 6 Import and Prep Python Output v2 Superfile Fixes.sas--------------------
+2026-10-30 23:31:13,940 - lob.base - INFO - --------------------Execution started for script: Create Next Month Folder--------------------
+2026-10-30 23:31:13,943 - lob.base - INFO - The next month folder date is: 11-25-2026
+2026-10-30 23:31:13,950 - lob.base - INFO - Year folder already exists
+2026-10-30 23:31:13,956 - lob.base - INFO - Next month folder created Successfully
+2026-10-30 23:31:13,959 - lob.base - INFO - Execution Time: 0 min 0 sec
+2026-10-30 23:31:13,961 - lob.base - INFO - --------------------Execution ends: Create Next Month Folder--------------------
+2026-10-30 23:31:13,963 - lob.base - INFO - All Scripts Executed
+2026-10-30 23:31:13,964 - lob.base - INFO - Complete Execution Time: 117 min 58 sec
