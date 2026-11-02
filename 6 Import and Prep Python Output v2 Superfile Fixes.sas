@@ -266,18 +266,18 @@ run;
 PROC SQL;
 	CREATE TABLE for_report As
 		Select A.*
-			, B.'Adj Number'n
+			, B.EMP_ID
 		From for_report as A left join mdl_curr.adj_decode as B
-			on compress(A.ADJ_NM) = b.adjnm
+			on compress(A.ADJ_NM) = compress(B.EMP_NM)
 	;
 QUIT;
 
 /* take individual means early */
 proc means data= for_report noprint nway missing;
-	class SEL_APPR_TYP_DC 'Adj Number'n ADJ_POS_DC USR_RPT_BRNCH_DC payperiod;
+	class SEL_APPR_TYP_DC EMP_ID ADJ_POS_DC USR_RPT_BRNCH_DC payperiod;
 	var model_elaps vehicle service_area incident appraisal;
 	output out= adj_mdl (drop = _type_ ) mean=;
-	where not missing('Adj Number'n);
+	where not missing(EMP_ID);
 run;
 
 /* only keep ones with at least 5 of that service type for pay period  */
@@ -320,7 +320,7 @@ quit;
 PROC SQL;
 	CREATE TABLE ind_report As
 		Select A.SEL_APPR_TYP_DC 
-			, a.'Adj Number'n
+			, a.EMP_ID
 			, a.ADJ_POS_DC 
 			, a.USR_RPT_BRNCH_DC 
 			, a.payperiod
@@ -436,7 +436,7 @@ run;
 /* export - no longer transpose since need to keep details */
 data ind_out;
 	set ind_report;
-	keep 'Adj Number'n	
+	keep EMP_ID	
 		USR_RPT_BRNCH_DC
 		sel_appr_typ_dc	
 		payperiod	
@@ -451,11 +451,11 @@ run;
 /* roll up to branch */
 /* transpose, making all missings zeroes */
 proc sort data=ind_report;
-	by 'Adj Number'n region USR_RPT_BRNCH_DC payperiod adj_pos_dc;
+	by EMP_ID region USR_RPT_BRNCH_DC payperiod adj_pos_dc;
 run;
 
 proc transpose data=ind_report out=ind_report2 prefix=adj;
-	by 'Adj Number'n region USR_RPT_BRNCH_DC payperiod adj_pos_dc;
+	by EMP_ID region USR_RPT_BRNCH_DC payperiod adj_pos_dc;
 	id SEL_APPR_TYP_DC;
 	var norm_adj;
 run;
@@ -500,10 +500,10 @@ PROC SQL;
 
 	, B.'total regular hours paid'n as total_regular_hours_paid 
 	From ind_report2 as A left join mdl_curr.hcoutput as B
-		on A.'Adj Number'n = B.'Adj Number'n
+		on A.EMP_ID = B.EMP_ID
 		/*and a.adj_pos_dc = b.'Adj Position'n*/
         /*and A.USR_RPT_BRNCH_DC = B.'Adjuster Team Branch'n*/
-	and A.payperiod = B.payperioddate
+	and A.payperiod = B.PayperiodEnd_dt
 	;
 QUIT;
 
@@ -563,47 +563,47 @@ run;
 
 /* transpose individual table */
 proc sort data= qlik;
-	by 'Adj Number'n payperiod region USR_RPT_BRNCH_DC adj_pos_dc;
+	by EMP_ID payperiod region USR_RPT_BRNCH_DC adj_pos_dc;
 run;
 
 /* 1- adjustment */
 proc transpose data=qlik out=qlik1 prefix=final_adj_cap_;
-	by 'Adj Number'n payperiod region USR_RPT_BRNCH_DC adj_pos_dc;
+	by EMP_ID payperiod region USR_RPT_BRNCH_DC adj_pos_dc;
 	id qlikapptyp;
 	var norm_adj;
 run;
 
 /* 2- vehicle */
 proc transpose data=qlik out=qlik2 prefix=vehicle_r_;
-	by 'Adj Number'n payperiod region USR_RPT_BRNCH_DC adj_pos_dc;
+	by EMP_ID payperiod region USR_RPT_BRNCH_DC adj_pos_dc;
 	id qlikapptyp;
 	var vehicle_r;
 run;
 
 /* 3- service area */
 proc transpose data=qlik out=qlik3 prefix=service_area_r_;
-	by 'Adj Number'n payperiod region USR_RPT_BRNCH_DC adj_pos_dc;
+	by EMP_ID payperiod region USR_RPT_BRNCH_DC adj_pos_dc;
 	id qlikapptyp;
 	var service_area_r;
 run;
 
 /* 4- incident */
 proc transpose data=qlik out=qlik4 prefix=incident_r_;
-	by 'Adj Number'n payperiod region USR_RPT_BRNCH_DC adj_pos_dc;
+	by EMP_ID payperiod region USR_RPT_BRNCH_DC adj_pos_dc;
 	id qlikapptyp;
 	var incident_r;
 run;
 
 /* 5- appraisal */
 proc transpose data=qlik out=qlik5 prefix=appraisal_r_;
-	by 'Adj Number'n payperiod region USR_RPT_BRNCH_DC adj_pos_dc;
+	by EMP_ID payperiod region USR_RPT_BRNCH_DC adj_pos_dc;
 	id qlikapptyp;
 	var appraisal_r;
 run;
 
 PROC SQL;
 	CREATE TABLE qlik_ind As
-		Select 	a.'Adj Number'n
+		Select 	a.EMP_ID
 			,a.payperiod
 			,a.USR_RPT_BRNCH_DC
 			,a.adj_pos_dc
@@ -656,25 +656,25 @@ PROC SQL;
 	From qlik1 as A 
 
 	left join qlik2
-		on A.'Adj Number'n = qlik2.'Adj Number'n
+		on A.EMP_ID = qlik2.EMP_ID
 		and A.payperiod = qlik2.payperiod
 		and A.USR_RPT_BRNCH_DC = qlik2.USR_RPT_BRNCH_DC
 		and A.adj_pos_dc = qlik2.adj_pos_dc
 
 	left join qlik3
-		on A.'Adj Number'n = qlik3.'Adj Number'n
+		on A.EMP_ID = qlik3.EMP_ID
 		and A.payperiod = qlik3.payperiod
 		and A.USR_RPT_BRNCH_DC = qlik3.USR_RPT_BRNCH_DC
 		and A.adj_pos_dc = qlik3.adj_pos_dc
 
 	left join qlik4 
-		on A.'Adj Number'n = qlik4.'Adj Number'n
+		on A.EMP_ID = qlik4.EMP_ID
 		and A.payperiod = qlik4.payperiod
 		and A.USR_RPT_BRNCH_DC = qlik4.USR_RPT_BRNCH_DC
 		and A.adj_pos_dc = qlik4.adj_pos_dc
 
 	left join qlik5
-		on A.'Adj Number'n = qlik5.'Adj Number'n
+		on A.EMP_ID = qlik5.EMP_ID
 		and A.payperiod = qlik5.payperiod
 		and A.USR_RPT_BRNCH_DC = qlik5.USR_RPT_BRNCH_DC
 		and A.adj_pos_dc = qlik5.adj_pos_dc
@@ -683,7 +683,6 @@ QUIT;
 
 data qlik_ind;
 	set qlik_ind;
-
 	if adj_pos_dc = 'Material Damage Adjuster' then
 		adj_pos_dc = 'Field Adjuster';
 run;
@@ -735,118 +734,102 @@ run;
 /* merge to hours / counts data */
 PROC SQL;
 	CREATE TABLE qlik_final As
-		Select 
-			"Material Damage" as SpecialtyGroup /* new */
-
-	,A.'Adjuster Region'n
-	,a.'Adjuster Team Branch'n
-	,a.'Adj Position'n
-	,a.'Adj Nm'n
-	,a.'Adj Number'n
-	,a.'SupvNam'n
-	,a.'Supv#'n
-	,a.payperioddate
-	,Year(a.payperioddate) as year
-	,Month(a.payperioddate) as month
-	,cat(a.'Adj Number'n,year(a.PayPeriodDate),put(month(a.PayPeriodDate),z2.),put(day(a.PayPeriodDate),z2.)) as EmpID_PP 						/* new */
-
-	/*	counts*/
-
-	,a.'MDA Services Complete'n
-	,a.'Direct Repair Program'n
-	,a.'Estimate Desk Review'n
-	,a.'Independent Adjuster'n
-	,a.'Open Shop'n
-	,a.'Photo Appraisal'n
-	,a.Salvage
-	,a.DimVal /*new */
-
-	/*hours*/
-
-	,a.'Total Regular Hours Paid'n
-	,a.'Total Overtime Hours Paid'n
-
-	/* ind target by type */
-
-	,b.final_adj_cap_MDA
-	,b.final_adj_cap_DRP
-	,b.final_adj_cap_EDR
-	,b.final_adj_cap_IA
-	,b.final_adj_cap_OS
-	,b.final_adj_cap_PA
-	,b.final_adj_cap_SAL
-	, 1 as final_adj_cap_DV /*new */
-
-	/* ind rank by type */
-
-	,b.vehicle_r_MDA
-	,b.vehicle_r_DRP
-	,b.vehicle_r_EDR
-	,b.vehicle_r_IA
-	,b.vehicle_r_OS
-	,b.vehicle_r_PA
-	,b.vehicle_r_SAL
-	, 1 as vehicle_r_DV /*new */
-
-	/* ind rank by type */
-
-	,b.service_area_r_MDA
-	,b.service_area_r_DRP
-	,b.service_area_r_EDR
-	,b.service_area_r_IA
-	,b.service_area_r_OS
-	,b.service_area_r_PA
-	,b.service_area_r_SAL
-	, 1 as service_area_r_DV /*new */
-
-	/* ind rank by type */
-
-	,b.incident_r_MDA
-	,b.incident_r_DRP
-	,b.incident_r_EDR
-	,b.incident_r_IA
-	,b.incident_r_OS
-	,b.incident_r_PA
-	,b.incident_r_SAL
-	, 1 as incident_r_DV /*new */
-
-	/* ind rank by type */
-
-	,b.appraisal_r_MDA
-	,b.appraisal_r_DRP
-	,b.appraisal_r_EDR
-	,b.appraisal_r_IA
-	,b.appraisal_r_OS
-	,b.appraisal_r_PA
-	,b.appraisal_r_SAL
-	, 1 as appraisal_r_DV /*new */
-
-	/* branch adjustments */
-
-	, b.MDA_adj_br
-	, B.DRP_adj_br
-	, b.EDR_adj_br
-	, b.IA_adj_br
-	, 1 as OS_adj_br
-	, b.PA_adj_br
-	, b.SAL_adj_br
-	, 1 as DV_adj_br /*new */
-
-	/* region adjustments */
-
-	, b.MDA_adj_rgn
-	, B.DRP_adj_rgn
-	, b.EDR_adj_rgn
-	, b.IA_adj_rgn
-	, 1 as OS_adj_rgn
-	, b.PA_adj_rgn
-	, b.SAL_adj_rgn
-	, 1 as DV_adj_rgn /*new */
-	From mdl_curr.hcoutput as A left join qlik_all as B
-		on b.'Adj Number'n = a.'Adj Number'n
-		and b.adj_pos_dc = a.'Adj Position'n
-		and b.USR_RPT_BRNCH_DC = a.'Adjuster Team Branch'n
-		and b.payperiod = a.payperioddate
+		Select
+			A.REGION,
+			A.RPT_ENTITY,
+			A.JOB_TTL,
+			A.USR_NTRL_ID,
+			A.EMP_NM,
+			A.EMP_ID,
+			A.SPVS_NM,
+			A.SPVS_EMP_ID,
+			A.PayperiodEnd,
+			A.year,
+			A.month,
+			A.EmpIDPPE,
+			A.PayperiodEnd_dt,
+			A.EmpIDPPE_dt,
+			A.DISCIPLINE,
+			A.DISC_SEC,
+			A.WRK_CLASS,
+			A.LEADER_NM,
+			A.LEADER_EMP_ID,
+			A.PRIM_ROL_NM,
+			A.MDA_Services_Complete,
+			A.Direct_Repair_Program,
+			A.Estimate_Desk_Review,
+			A.Independent_Adjuster,
+			A.Open_Shop,
+			A.Photo_Appraisal,
+			A.Salvage,
+			A.DimVal,
+			A.TotalRegHrsPaid,
+			A.TotalOTHrsPaid,
+			A.TotalPTOHrsPaid,
+			B.final_adj_cap_MDA,
+			B.final_adj_cap_DRP,
+			B.final_adj_cap_EDR,
+			B.final_adj_cap_IA,
+			B.final_adj_cap_OS,
+			B.final_adj_cap_PA,
+			B.final_adj_cap_SAL,
+			B.final_adj_cap_DV,
+			B.vehicle_r_MDA,
+			B.vehicle_r_DRP,
+			B.vehicle_r_EDR,
+			B.vehicle_r_IA,
+			B.vehicle_r_OS,
+			B.vehicle_r_PA,
+			B.vehicle_r_SAL,
+			B.vehicle_r_DV,
+			B.service_area_r_MDA,
+			B.service_area_r_MDA,
+			B.service_area_r_DRP,
+			B.service_area_r_EDR,
+			B.service_area_r_IA,
+			B.service_area_r_OS,
+			B.service_area_r_PA,
+			B.service_area_r_SAL,
+			B.service_area_r_DV,
+			B.incident_r_MDA,
+			B.incident_r_MDA,
+			B.incident_r_DRP,
+			B.incident_r_EDR,
+			B.incident_r_IA,
+			B.incident_r_OS,
+			B.incident_r_PA,
+			B.incident_r_SAL,
+			B.incident_r_DV,
+			B.appraisal_r_MDA,
+			B.appraisal_r_MDA,
+			B.appraisal_r_DRP,
+			B.appraisal_r_EDR,
+			B.appraisal_r_IA,
+			B.appraisal_r_OS,
+			B.appraisal_r_PA,
+			B.appraisal_r_SAL,
+			B.appraisal_r_DV,
+			B.MDA_adj_br,
+			B.DRP_adj_br,
+			B.EDR_adj_br,
+			B.IA_adj_br,
+			1 as OS_adj_br,
+			B.PA_adj_br,
+			B.SAL_adj_br,
+			B.DV_adj_br,
+			B.MDA_adj_rgn,
+			B.DRP_adj_rgn,
+			B.EDR_adj_rgn,
+			B.IA_adj_rgn,
+			1 as OS_adj_rgn,
+			B.PA_adj_rgn,
+			B.SAL_adj_rgn,
+			B.DV_adj_rgn
+		From mdl_curr.hcoutput as A left join qlik_all as B
+			on B.EMP_ID = A.EMP_ID
+			and B.adj_pos_dc = A.JOB_TTL
+			and B.USR_RPT_BRNCH_DC = A.RPT_ENTITY
+			and B.payperiod = A.PayperiodEnd_dt
 	;
 QUIT;
 
@@ -854,7 +837,7 @@ proc sql;
 	create table duplicates as 
 		select *
 			from qlik_final
-				group by 'Adj Number'n, payperioddate
+				group by EMP_ID, PayperiodEnd_dt
 					having count(*) gt 1;
 quit;
 
@@ -871,32 +854,54 @@ data qlik_final (drop=i);
 	end;
 run;
 
+data qlik_final;
+	set qlik_final;
+	keep REGION RPT_ENTITY JOB_TTL USR_NTRL_ID EMP_NM EMP_ID SPVS_NM SPVS_EMP_ID
+		PayperiodEnd year month EmpIDPPE PayperiodEnd_dt EmpIDPPE_dt
+		DISCIPLINE DISC_SEC WRK_CLASS LEADER_NM LEADER_EMP_ID PRIM_ROL_NM
+		MDA_Services_Complete Direct_Repair_Program Estimate_Desk_Review
+		Independent_Adjuster Open_Shop Photo_Appraisal Salvage DimVal
+		TotalRegHrsPaid TotalOTHrsPaid TotalPTOHrsPaid
+		final_adj_cap_MDA final_adj_cap_DRP final_adj_cap_EDR final_adj_cap_IA
+		final_adj_cap_OS final_adj_cap_PA final_adj_cap_SAL final_adj_cap_DV
+		vehicle_r_MDA vehicle_r_DRP vehicle_r_EDR vehicle_r_IA vehicle_r_OS
+		vehicle_r_PA vehicle_r_SAL vehicle_r_DV
+		service_area_r_MDA service_area_r_DRP service_area_r_EDR service_area_r_IA service_area_r_OS
+		service_area_r_PA service_area_r_SAL service_area_r_DV
+		incident_r_MDA incident_r_DRP incident_r_EDR incident_r_IA incident_r_OS incident_r_PA
+		incident_r_SAL incident_r_DV
+		appraisal_r_MDA appraisal_r_DRP appraisal_r_EDR appraisal_r_IA appraisal_r_OS appraisal_r_PA
+		appraisal_r_SAL appraisal_r_DV
+		MDA_adj_br DRP_adj_br EDR_adj_br IA_adj_br OS_adj_br PA_adj_br SAL_adj_br DV_adj_br
+		MDA_adj_rgn DRP_adj_rgn EDR_adj_rgn IA_adj_rgn OS_adj_rgn PA_adj_rgn SAL_adj_rgn DV_adj_rgn;
+run;
+
 /* transpose completed services file */
 PROC SQL;
 	CREATE TABLE qa_completed As
-		Select b.'Adj Number'n
-			,b.'Adj Position'n
-			,B.'Adjuster Team Branch'n
-			,B.payperioddate
-			, b.'Direct Repair Program'n as DirectRepairProgram
-			,b.'mda services complete'n as MaterialDamageAdjuster	
-			,b.'Estimate Desk Review'n as EstimateDeskReview	
-			,b.Salvage  
-			,b.'Open Shop'n as OpenShop	
-			,b.'Independent Adjuster'n as IndependentAdjuster	
-			,b.'Photo Appraisal'n as PhotoAppraisal
-			,b.DimVal /*new */
-	From mdl_curr.hcoutput as b
+		Select b.EMP_ID
+			,b.JOB_TTL
+			,b.RPT_ENTITY
+			,b.PayperiodEnd_dt
+			,b.Direct_Repair_Program as DirectRepairProgram
+			,b.MDA_Services_Complete as MaterialDamageAdjuster
+			,b.Estimate_Desk_Review as EstimateDeskReview
+			,b.Salvage
+			,b.Open_Shop as OpenShop
+			,b.Independent_Adjuster as IndependentAdjuster
+			,b.Photo_Appraisal as PhotoAppraisal
+			,b.DimVal
+		From mdl_curr.hcoutput as b
 	;
 QUIT;
 
 proc sort data= qa_completed;
-	by 'Adj Number'n 'Adjuster Team Branch'n payperioddate 'Adj Position'n;
+	by EMP_ID RPT_ENTITY PayperiodEnd_dt JOB_TTL;
 run;
 
 /* transpose wide to long */
 proc transpose data=qa_completed out=qa_completed_w /*prefix=adj*/;
-	by 'Adj Number'n 'Adjuster Team Branch'n payperioddate 'Adj Position'n;
+	by EMP_ID RPT_ENTITY PayperiodEnd_dt JOB_TTL;
 
 	/*	    id SEL_APPR_TYP_DC;*/
 	var DirectRepairProgram -- DimVal;
@@ -913,26 +918,25 @@ run;
 PROC SQL;
 	CREATE TABLE qlik_adj1 As
 		Select b._NAME_ as SEL_APPR_TYP_DC
-			,b.'Adj Number'n
-			,a.region as Adjuster_Region
-			,b.'Adjuster Team Branch'n
-			,b.'Adj Position'n
-			,b.payperioddate as payperiod
-			,cat(b.'Adj Number'n,year(b.PayPeriodDate),put(month(b.PayPeriodDate),z2.),put(day(b.PayPeriodDate),z2.)) as EmpID_PP  /*MB will fill */
-
-	,b.col1 as Closed_Svc
-	,coalesce(a.norm_adj,1) as norm_adj
-	,a.vehicle_r
-	,a.service_area_r
-	,a.incident_r
-	,a.appraisal_r
-	From qa_completed_w as b
-		left join ind_report2 as a
-			on 		A.SEL_APPR_TYP_DC = b._NAME_
-			and b.'Adj Number'n = a.'Adj Number'n
-			and	B.'Adjuster Team Branch'n = a.USR_RPT_BRNCH_DC
-			and b.'Adj Position'n = a.ADJ_POS_DC
-			and B.payperioddate =	a.PayPeriod
+			,b.EMP_ID
+			,a.region as REGION
+			,b.RPT_ENTITY
+			,b.JOB_TTL
+			,b.PayperiodEnd_dt as PayPeriodEnd_dt
+			,cat(b.EMP_ID,year(b.PayperiodEnd_dt),put(month(b.PayperiodEnd_dt),z2.),put(day(b.PayperiodEnd_dt),z2.)) as EmpIDPPE_dt
+			,b.col1 as Closed_Svc
+			,coalesce(a.norm_adj,1) as norm_adj
+			,a.vehicle_r
+			,a.service_area_r
+			,a.incident_r
+			,a.appraisal_r
+		From qa_completed_w as b
+			left join ind_report2 as a
+				on A.SEL_APPR_TYP_DC = b._NAME_
+				and b.EMP_ID = a.EMP_ID
+				and B.RPT_ENTITY = a.USR_RPT_BRNCH_DC
+				and B.JOB_TTL = a.ADJ_POS_DC
+				and B.PayperiodEnd_dt = a.PayPeriod
 	;
 QUIT;
 
@@ -941,20 +945,26 @@ data qlik_adj1;
 	where not missing(Closed_Svc);
 run;
 
+data qlik_adj1;
+	set qlik_adj1;
+	keep SEL_APPR_TYP_DC EMP_ID REGION RPT_ENTITY JOB_TTL PayPeriodEnd_dt
+		EmpIDPPE_dt Closed_Svc norm_adj vehicle_r service_area_r incident_r appraisal_r;
+run;
+
 /* excel output */
 %macro ExportCustom();
 	%if &flag. = 1 %then
 		%do;
 
 			proc export data=qlik_final 
-				outfile="/ere/local/shared/actuarial/Share/Claims/WPC/Material Damage/executable/Output/QlikSuperfile_md.xlsx"
+				outfile="/ere/local/shared/actuarial/Share/Claims/WPC/Material Damage/executable/Output/MaterialDamage-QlikSuperfile.xlsx"
 				dbms=xlsx
 				replace;
 			run;
 
 			/* excel output */
 			proc export data=qlik_adj1 
-				outfile="/ere/local/shared/actuarial/Share/Claims/WPC/Material Damage/executable/Output/QlikAdjustments SAS_md.xlsx"
+				outfile="/ere/local/shared/actuarial/Share/Claims/WPC/Material Damage/executable/Output/MaterialDamage-QlikAdjustments.xlsx"
 				dbms=xlsx
 				replace;
 			run;
@@ -964,14 +974,14 @@ run;
 		%do;
 
 			proc export data=qlik_final 
-				outfile="&output_path_csv/QlikSuperfile_md.xlsx"
+				outfile="&output_path_csv/MaterialDamage-QlikSuperfile.xlsx"
 				dbms=xlsx
 				replace;
 			run;
 
 			/* excel output */
 			proc export data=qlik_adj1 
-				outfile="&output_path_csv/QlikAdjustments SAS_md.xlsx"
+				outfile="&output_path_csv/MaterialDamage-QlikAdjustments.xlsx"
 				dbms=xlsx
 				replace;
 			run;
