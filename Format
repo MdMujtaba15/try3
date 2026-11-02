@@ -1,9 +1,102 @@
-# Fill missing values according to each column's data type
-string_cols = df.select_dtypes(include=["string", "object"]).columns
-numeric_cols = df.select_dtypes(include=["number"]).columns
+/* merge to hours / counts data */
+PROC SQL;
+	CREATE TABLE qlik_final As
+		Select
+			A.REGION,
+			A.RPT_ENTITY,
+			A.JOB_TTL,
+			A.USR_NTRL_ID,
+			A.EMP_NM,
+			A.EMP_ID,
+			A.SPVS_NM,
+			A.SPVS_EMP_ID,
+			A.PayperiodEnd,
+			A.year,
+			A.month,
+			A.EmpIDPPE,
+			A.PayperiodEnd_dt,
+			A.EmpIDPPE_dt,
+			A.DISCIPLINE,
+			A.DISC_SEC,
+			A.WRK_CLASS,
+			A.LEADER_NM,
+			A.LEADER_EMP_ID,
+			A.PRIM_ROL_NM,
+			A.'MDA Services Complete'n AS MDA_Services_Complete,
+			A.'Direct Repair Program'n AS Direct_Repair_Program,
+			A.'Estimate Desk Review'n AS Estimate_Desk_Review,
+			A.'Independent Adjuster'n AS Independent_Adjuster,
+			A.'Open Shop'n AS Open_Shop,
+			A.'Photo Appraisal'n AS Photo_Appraisal,
+			A.Salvage,
+			A.DimVal,
+			A.TotalRegHrsPaid,
+			A.TotalOTHrsPaid,
+			A.TotalPTOHrsPaid,
+			B.final_adj_cap_MDA,
+			B.final_adj_cap_DRP,
+			B.final_adj_cap_EDR,
+			B.final_adj_cap_IA,
+			B.final_adj_cap_OS,
+			B.final_adj_cap_PA,
+			B.final_adj_cap_SAL,
+			B.final_adj_cap_DV,
+			B.vehicle_r_MDA,
+			B.vehicle_r_DRP,
+			B.vehicle_r_EDR,
+			B.vehicle_r_IA,
+			B.vehicle_r_OS,
+			B.vehicle_r_PA,
+			B.vehicle_r_SAL,
+			B.vehicle_r_DV,
+			B.service_area_r_MDA,
+			B.service_area_r_DRP,
+			B.service_area_r_EDR,
+			B.service_area_r_IA,
+			B.service_area_r_OS,
+			B.service_area_r_PA,
+			B.service_area_r_SAL,
+			B.service_area_r_DV,
+			B.incident_r_MDA,
+			B.incident_r_DRP,
+			B.incident_r_EDR,
+			B.incident_r_IA,
+			B.incident_r_OS,
+			B.incident_r_PA,
+			B.incident_r_SAL,
+			B.incident_r_DV,
+			B.appraisal_r_MDA,
+			B.appraisal_r_DRP,
+			B.appraisal_r_EDR,
+			B.appraisal_r_IA,
+			B.appraisal_r_OS,
+			B.appraisal_r_PA,
+			B.appraisal_r_SAL,
+			B.appraisal_r_DV,
+			B.MDA_adj_br,
+			B.DRP_adj_br,
+			B.EDR_adj_br,
+			B.IA_adj_br,
+			1 as OS_adj_br,
+			B.PA_adj_br,
+			B.SAL_adj_br,
+			B.DV_adj_br,
+			B.MDA_adj_rgn,
+			B.DRP_adj_rgn,
+			B.EDR_adj_rgn,
+			B.IA_adj_rgn,
+			1 as OS_adj_rgn,
+			B.PA_adj_rgn,
+			B.SAL_adj_rgn,
+			B.DV_adj_rgn
+		From mdl_curr.hcoutput as A left join qlik_all as B
+			on B.EMP_ID = A.EMP_ID
+			and B.adj_pos_dc = A.JOB_TTL
+			and B.USR_RPT_BRNCH_DC = A.RPT_ENTITY
+			and B.payperiod = A.PayperiodEnd_dt
+	;
+QUIT;
 
-df[string_cols] = df[string_cols].fillna("-1")
-df[numeric_cols] = df[numeric_cols].fillna(-1)
 
 
 
