@@ -1,4 +1,4 @@
-/* Material Damage SAS Script 6 : Import and Prep Python Output v2 Superfile Fixes*/
+/* New Updated Material Damage SAS Script 6 : Import and Prep Python Output v2 Superfile Fixes*/
 
 %macro custom_infile();
 	%if &flag. = 1 %then
