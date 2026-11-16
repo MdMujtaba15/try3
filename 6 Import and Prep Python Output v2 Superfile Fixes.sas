@@ -1,4 +1,4 @@
-/**/
+/*Old SAS Script 6 */
 /*%let flag=0;*/
 /*libname mdl_curr "/ere/local/shared/actuarial/Share/Claims/WPC/Material Damage V2/2025/12-24-2025";*/
 /*libname src "/ere/local/shared/actuarial/Share/Claims/WPC/WPC Streamlining Project/Central Scripts Repository/Material Damage V2/Source";*/
